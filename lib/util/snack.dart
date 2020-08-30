@@ -120,9 +120,9 @@ class AppSnackbar {
       duration: new Duration(seconds: 20),
       backgroundColor: Colors.red.shade900,
       action: SnackBarAction(
-        label: actionLabel,
+        label: actionLabel == null ? '' : actionLabel,
         onPressed: () {
-          listener.onActionPressed(Error);
+          if (listener != null) listener.onActionPressed(Error);
         },
       ),
     );

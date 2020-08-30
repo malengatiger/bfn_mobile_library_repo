@@ -13,25 +13,34 @@ import 'package:bfnlibrary/util/functions.dart';
 import 'package:bfnlibrary/util/prefs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class Net {
-  static Firestore db = Firestore.instance;
   static FirebaseAuth auth = FirebaseAuth.instance;
   static const Map<String, String> headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
   };
 
+  static bool firebaseInitialized = false;
+  static FirebaseFirestore db;
+
   static Future _getCachedURL() async {
     var url = await Prefs.getUrl();
     return url;
   }
 
-  static const String BFN = 'bfn/admin/';
+  static const String BFN = '/bfn/admin/';
   static Future<List<NodeInfo>> getNodesFromFirestore() async {
+    if (!firebaseInitialized) {
+      await Firebase.initializeApp();
+      debugPrint('🔵 🔵 🔵 🔵 🔵 🔵 🔵 🔵 Firebase has been initialized 🍎');
+      db = FirebaseFirestore.instance;
+      firebaseInitialized = true;
+    }
     var list = List<NodeInfo>();
     print(
         '🍎 🍎 🍎 🍎 🍎 🍎 getNodesFromFirestore: about to call auth.currentUser ... ');
@@ -311,6 +320,7 @@ class Net {
     }
     SupplierProfile profile = SupplierProfile.fromJson(json.decode(response));
     debugPrint('🍎 🍊 Net: getSupplierProfile: found ${profile.toJson()}');
+
     return profile;
   }
 
@@ -366,6 +376,8 @@ class Net {
   static Future<List<UserDTO>> getUsers() async {
     var node = await Prefs.getNode();
     String url = node.webAPIUrl + '${BFN}getUsers';
+    print('🌸 🌸 🌸 Net: ...... getUsers ............ 🍊 $url');
+
     List<UserDTO> users = List();
     final response = await http.get(url);
     if (response.statusCode == 200) {

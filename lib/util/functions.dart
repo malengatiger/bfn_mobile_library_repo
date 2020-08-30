@@ -72,6 +72,14 @@ Color getRandomPastelColor() {
   return _colors.elementAt(index);
 }
 
+p(msg) {
+  if (msg is String) {
+    debugPrint(msg);
+  } else {
+    print(msg);
+  }
+}
+
 class Styles {
   static const small = 14.0;
   static const medium = 20.0;
