@@ -8,7 +8,7 @@ class BFNAuth {
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  static Future<FirebaseUser> handleSignIn() async {
+  static Future<User> handleSignIn() async {
     print('🍎 🍎 🍎 🍎 🍎 🍎 BFNAuth: handleSignIn ... _googleSignIn.signIn()');
     try {
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
@@ -18,12 +18,12 @@ class BFNAuth {
           await googleUser.authentication;
       print(
           '🍋 🍋 🍋 🍋   BFNAuth: handleSignIn ... GoogleAuthProvider.getCredential ...');
-      final AuthCredential credential = GoogleAuthProvider.getCredential(
+      final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final FirebaseUser user =
+      final User user =
           (await _auth.signInWithCredential(credential)).user;
 
       print('🌍 🌍  BFNAuth: FirebaseUser signed in ... ${user.displayName}');

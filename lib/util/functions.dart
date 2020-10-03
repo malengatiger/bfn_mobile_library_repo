@@ -72,11 +72,12 @@ Color getRandomPastelColor() {
   return _colors.elementAt(index);
 }
 
-p(msg) {
-  if (msg is String) {
-    debugPrint(msg);
+p(message) {
+  if (message is String) {
+    debugPrint(
+        '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second} - $message');
   } else {
-    print(msg);
+    print(message);
   }
 }
 

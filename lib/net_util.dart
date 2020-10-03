@@ -72,10 +72,10 @@ class Net {
   }
 
   static Future _readCurrentNodes(List<NodeInfo> list) async {
-    var snapshot = await db.collection("nodes").getDocuments();
+    var snapshot = await db.collection("nodes").get();
     print(
-        '🥏 🥏 🥏 🥏 nodes found on Firestore: 🥏 ${snapshot.documents.length} 🥏 ');
-    snapshot.documents.forEach((doc) {
+        '🥏 🥏 🥏 🥏 nodes found on Firestore: 🥏 ${snapshot.docs.length} 🥏 ');
+    snapshot.docs.forEach((doc) {
       var data = doc.data();
 
       var node = NodeInfo.fromJson(data);
@@ -206,9 +206,9 @@ class Net {
     var qs = await db
         .collection("accounts")
         .where("identifier", isEqualTo: identifier)
-        .getDocuments();
+        .get();
     AccountInfo acct;
-    qs.documents.forEach((doc) {
+    qs.docs.forEach((doc) {
       acct = AccountInfo.fromJson(doc.data());
     });
     if (acct == null) {
@@ -306,7 +306,8 @@ class Net {
         await get(node.webAPIUrl + '${BFN}getAccount?accountId=$accountId');
 
     AccountInfo acctInfo = AccountInfo.fromJson(json.decode(response));
-    debugPrint('🍎 🍊 Net: getAccount: found ${acctInfo.toJson()}');
+    debugPrint(
+        '🍎 🍊 Net: getAccount: .................... found ${acctInfo.toJson()}');
     return acctInfo;
   }
 
