@@ -1,4 +1,4 @@
-import 'package:bfnlibrary/data/anchor.dart';
+import 'package:bfnlibrary/data/network_operator.dart';
 import 'package:bfnlibrary/net_util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,8 +23,7 @@ class BFNAuth {
         idToken: googleAuth.idToken,
       );
 
-      final User user =
-          (await _auth.signInWithCredential(credential)).user;
+      final User user = (await _auth.signInWithCredential(credential)).user;
 
       print('🌍 🌍  BFNAuth: FirebaseUser signed in ... ${user.displayName}');
       return user;
@@ -34,14 +33,15 @@ class BFNAuth {
     return null;
   }
 
-  static Future<Anchor> anchorSignIn(String email, String password) async {
+  static Future<NetworkOperator> anchorSignIn(
+      String email, String password) async {
     var authResult = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
     if (authResult.user == null) {
       throw Exception("User authentication failed");
     }
 
-    var anc = await Net.getAnchor(authResult.user.uid);
+    var anc = await Net.getNetworkOperator();
     debugPrint('Anchor retrieved: ${anc.toJson()}');
     return anc;
   }

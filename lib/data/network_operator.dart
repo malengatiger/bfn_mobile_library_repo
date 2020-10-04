@@ -1,4 +1,4 @@
-class Anchor {
+class NetworkOperator {
   String accountId, issuedBy;
   int tradeFrequencyInMinutes;
   double defaultOfferDiscount;
@@ -7,7 +7,7 @@ class Anchor {
   double minimumInvoiceAmount, maximumInvoiceAmount, maximumInvestment;
   List<TradeMatrix> tradeMatrices;
 
-  Anchor(
+  NetworkOperator(
       {this.accountId,
       this.tradeFrequencyInMinutes,
       this.defaultOfferDiscount,
@@ -22,7 +22,7 @@ class Anchor {
       this.name,
       this.issuedBy});
 
-  Anchor.fromJson(Map data) {
+  NetworkOperator.fromJson(Map data) {
     this.accountId = data['accountId'];
     this.name = data['name'];
     this.issuedBy = data['issuedBy'];

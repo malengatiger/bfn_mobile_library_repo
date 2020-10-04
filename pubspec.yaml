@@ -29,7 +29,7 @@ dependencies:
   flutter_dotenv: ^2.1.0
   introduction_screen: ^1.0.9
 
-  cloud_firestore: ^0.14.1+2
+#  cloud_firestore: ^0.14.1+2
   intl: ^0.16.1
   shared_preferences: ^0.5.12
   dynamic_theme: 1.0.1

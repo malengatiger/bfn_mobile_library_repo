@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:bfnlibrary/data/account.dart';
-import 'package:bfnlibrary/data/anchor.dart';
+import 'package:bfnlibrary/data/network_operator.dart';
 import 'package:bfnlibrary/data/node_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,7 +50,7 @@ class Prefs {
     return association;
   }
 
-  static Future saveAnchor(Anchor anchor) async {
+  static Future saveAnchor(NetworkOperator anchor) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     Map map = anchor.toJson();
     var jx = json.encode(map);
@@ -59,15 +59,16 @@ class Prefs {
     return null;
   }
 
-  static Future<Anchor> getAnchor() async {
+  static Future<NetworkOperator> getAnchor() async {
     var prefs = await SharedPreferences.getInstance();
     var string = prefs.getString('anchor');
     if (string == null) {
       return null;
     }
     var jx = json.decode(string);
-    var anchor = new Anchor.fromJson(jx);
-    print("🌽 🌽 🌽 Anchor: retrieved : 🧩 🧩 🧩 🧩 🧩 ${anchor.toJson()} 🍎 🍎");
+    var anchor = new NetworkOperator.fromJson(jx);
+    print(
+        "🌽 🌽 🌽 Anchor: retrieved : 🧩 🧩 🧩 🧩 🧩 ${anchor.toJson()} 🍎 🍎");
     return anchor;
   }
 

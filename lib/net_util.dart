@@ -1,21 +1,17 @@
 import 'dart:convert';
 
 import 'package:bfnlibrary/data/account.dart';
-import 'package:bfnlibrary/data/anchor.dart';
 import 'package:bfnlibrary/data/dashboard_data.dart';
 import 'package:bfnlibrary/data/fb_user.dart';
 import 'package:bfnlibrary/data/invoice.dart';
 import 'package:bfnlibrary/data/invoice_offer.dart';
+import 'package:bfnlibrary/data/network_operator.dart';
 import 'package:bfnlibrary/data/node_info.dart';
 import 'package:bfnlibrary/data/profile.dart';
 import 'package:bfnlibrary/data/user.dart';
-import 'package:bfnlibrary/util/functions.dart';
 import 'package:bfnlibrary/util/prefs.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class Net {
@@ -26,72 +22,72 @@ class Net {
   };
 
   static bool firebaseInitialized = false;
-  static FirebaseFirestore db;
 
   static Future _getCachedURL() async {
     var url = await Prefs.getUrl();
     return url;
   }
 
+  static Future getNetworkOperator() async {}
+
   static const String BFN = '/bfn/admin/';
-  static Future<List<NodeInfo>> getNodesFromFirestore() async {
-    if (!firebaseInitialized) {
-      await Firebase.initializeApp();
-      debugPrint('🔵 🔵 🔵 🔵 🔵 🔵 🔵 🔵 Firebase has been initialized 🍎');
-      db = FirebaseFirestore.instance;
-      firebaseInitialized = true;
-    }
-    var list = List<NodeInfo>();
-    print(
-        '🍎 🍎 🍎 🍎 🍎 🍎 getNodesFromFirestore: about to call auth.currentUser ... ');
-    var result = auth.currentUser;
-    if (result == null) {
-      print(
-          '🍎 🍎 🍎 🍎  there is no current auth user ... login with admin 🍎 🍎');
-      var email = DotEnv().env['email'];
-      var pass = DotEnv().env['password'];
-      print(
-          '🌸 🌸 🌸 🌸 🌸 ADMIN 🧡 auth for getting nodes from firestore: 🧡🧡 email from .env : 🥏  $email 🥏  pass: $pass 🥏 ');
-      var userResult = await auth.signInWithEmailAndPassword(
-          email: 'aubrey@bfn.com',
-          password: '2a91f706-81c7-47bf-a172-3d36095d5a32');
-      print(
-          '🍊 🍊 🍊 Logged into Firebase with .env credentials,  🌸 uid: ${userResult.user.uid} ... getting nodes ...');
-      list = await _readCurrentNodes(list);
-      await auth.signOut();
-      print('🍊 🍊 🍊 Logged OUT of Firebase  ${userResult.user.uid} ... ');
-    } else {
-      print(
-          '🍎 🍎 🍎 🍎 getNodesFromFirestore: about to get nodes from firestore  🍎 🍎');
-      list = await _readCurrentNodes(list);
-    }
-    if (list.isNotEmpty) {
-      await Prefs.saveNodes(list);
-    }
-    return list;
-  }
-
-  static Future _readCurrentNodes(List<NodeInfo> list) async {
-    var snapshot = await db.collection("nodes").get();
-    print(
-        '🥏 🥏 🥏 🥏 nodes found on Firestore: 🥏 ${snapshot.docs.length} 🥏 ');
-    snapshot.docs.forEach((doc) {
-      var data = doc.data();
-
-      var node = NodeInfo.fromJson(data);
-      var springBootProfile = DotEnv().env['springBootProfile'];
-      if (springBootProfile == null) {
-        list.add(node);
-        print('🥏 data from Firestore: $data');
-      } else {
-        if (node.springBootProfile == springBootProfile) {
-          list.add(node);
-          print('🥏 data from Firestore: $data');
-        }
-      }
-    });
-    return list;
-  }
+  // static Future<List<NodeInfo>> getNodesFromFirestore() async {
+  //   if (!firebaseInitialized) {
+  //     await Firebase.initializeApp();
+  //     debugPrint('🔵 🔵 🔵 🔵 🔵 🔵 🔵 🔵 Firebase has been initialized 🍎');
+  //     firebaseInitialized = true;
+  //   }
+  //   var list = List<NodeInfo>();
+  //   print(
+  //       '🍎 🍎 🍎 🍎 🍎 🍎 getNodesFromFirestore: about to call auth.currentUser ... ');
+  //   var result = auth.currentUser;
+  //   if (result == null) {
+  //     print(
+  //         '🍎 🍎 🍎 🍎  there is no current auth user ... login with admin 🍎 🍎');
+  //     var email = DotEnv().env['email'];
+  //     var pass = DotEnv().env['password'];
+  //     print(
+  //         '🌸 🌸 🌸 🌸 🌸 ADMIN 🧡 auth for getting nodes from firestore: 🧡🧡 email from .env : 🥏  $email 🥏  pass: $pass 🥏 ');
+  //     var userResult = await auth.signInWithEmailAndPassword(
+  //         email: 'aubrey@bfn.com',
+  //         password: '2a91f706-81c7-47bf-a172-3d36095d5a32');
+  //     print(
+  //         '🍊 🍊 🍊 Logged into Firebase with .env credentials,  🌸 uid: ${userResult.user.uid} ... getting nodes ...');
+  //     list = await _readCurrentNodes(list);
+  //     await auth.signOut();
+  //     print('🍊 🍊 🍊 Logged OUT of Firebase  ${userResult.user.uid} ... ');
+  //   } else {
+  //     print(
+  //         '🍎 🍎 🍎 🍎 getNodesFromFirestore: about to get nodes from firestore  🍎 🍎');
+  //     list = await _readCurrentNodes(list);
+  //   }
+  //   if (list.isNotEmpty) {
+  //     await Prefs.saveNodes(list);
+  //   }
+  //   return list;
+  // }
+  //
+  // static Future _readCurrentNodes(List<NodeInfo> list) async {
+  //   var snapshot = await db.collection("nodes").get();
+  //   print(
+  //       '🥏 🥏 🥏 🥏 nodes found on Firestore: 🥏 ${snapshot.docs.length} 🥏 ');
+  //   snapshot.docs.forEach((doc) {
+  //     var data = doc.data();
+  //
+  //     var node = NodeInfo.fromJson(data);
+  //     var springBootProfile = DotEnv().env['springBootProfile'];
+  //     if (springBootProfile == null) {
+  //       list.add(node);
+  //       print('🥏 data from Firestore: $data');
+  //     } else {
+  //       if (node.springBootProfile == springBootProfile) {
+  //         list.add(node);
+  //         print('🥏 data from Firestore: $data');
+  //       }
+  //     }
+  //   });
+  //   return list;
+  // }
 
   static Future<String> get(String mUrl) async {
     var start = DateTime.now();
@@ -154,16 +150,16 @@ class Net {
     }
   }
 
-  static Future<Anchor> updateAnchor(Anchor anchor) async {
+  static Future<NetworkOperator> updateAnchor(NetworkOperator anchor) async {
     String mx = await buildUrl();
     debugPrint('🌸 CONCATENATED URL: 🌸 $mx' + 'bfn/admin/updateAnchor');
     final response = await post(mx + 'bfn/admin/updateAnchor', anchor.toJson());
     var m = json.decode(response);
-    var acct = Anchor.fromJson(m);
+    var acct = NetworkOperator.fromJson(m);
     return acct;
   }
 
-  static Future<Anchor> createAnchor(Anchor anchor) async {
+  static Future<NetworkOperator> createAnchor(NetworkOperator anchor) async {
     debugPrint('🍊🍊🍊🍊🍊 createAnchor starting the call ...');
     var nodes = await Prefs.getNodes();
     if (nodes == null || nodes.isEmpty) {
@@ -183,7 +179,7 @@ class Net {
     debugPrint('🌸 CONCATENATED URL: 🌸 $mx' + 'bfn/admin/createAnchor');
     final response = await post(mx + 'bfn/admin/createAnchor', anchor.toJson());
     var m = json.decode(response);
-    var acct = Anchor.fromJson(m);
+    var acct = NetworkOperator.fromJson(m);
     return acct;
   }
 
@@ -202,43 +198,43 @@ class Net {
     return mx;
   }
 
-  static Future<Anchor> getAnchor(String identifier) async {
-    var qs = await db
-        .collection("accounts")
-        .where("identifier", isEqualTo: identifier)
-        .get();
-    AccountInfo acct;
-    qs.docs.forEach((doc) {
-      acct = AccountInfo.fromJson(doc.data());
-    });
-    if (acct == null) {
-      throw Exception('Account not found on Firestore');
-    }
-    var nodes = await Prefs.getNodes();
-    if (nodes == null || nodes.isEmpty) {
-      throw Exception('Nodes not found in Prefs');
-    }
-    NodeInfo node;
-    nodes.forEach((n) {
-      if (n.addresses.first.contains(acct.name)) {
-        node = n;
-      }
-    });
-    if (node == null) {
-      throw Exception('Node cannot be determined from list of ${nodes.length}');
-    }
-    await Prefs.saveNode(node);
-    var bag = {
-      "identifier": identifier,
-    };
-    debugPrint('🍊🍊🍊🍊🍊 getAnchor starting the call ...');
-    var url = await buildUrl();
-    final response = await get(url + '${BFN}getAnchor?identifier=$identifier');
-    var m = json.decode(response);
-    var anchor = Anchor.fromJson(m);
-    prettyPrint(anchor.toJson(), "🥏 🥏 🥏 🥏 ANCHOR RECEIVED 🍎 ");
-    return anchor;
-  }
+  // static Future<Anchor> getAnchor(String identifier) async {
+  //   var qs = await db
+  //       .collection("accounts")
+  //       .where("identifier", isEqualTo: identifier)
+  //       .get();
+  //   AccountInfo acct;
+  //   qs.docs.forEach((doc) {
+  //     acct = AccountInfo.fromJson(doc.data());
+  //   });
+  //   if (acct == null) {
+  //     throw Exception('Account not found on Firestore');
+  //   }
+  //   var nodes = await Prefs.getNodes();
+  //   if (nodes == null || nodes.isEmpty) {
+  //     throw Exception('Nodes not found in Prefs');
+  //   }
+  //   NodeInfo node;
+  //   nodes.forEach((n) {
+  //     if (n.addresses.first.contains(acct.name)) {
+  //       node = n;
+  //     }
+  //   });
+  //   if (node == null) {
+  //     throw Exception('Node cannot be determined from list of ${nodes.length}');
+  //   }
+  //   await Prefs.saveNode(node);
+  //   var bag = {
+  //     "identifier": identifier,
+  //   };
+  //   debugPrint('🍊🍊🍊🍊🍊 getAnchor starting the call ...');
+  //   var url = await buildUrl();
+  //   final response = await get(url + '${BFN}getAnchor?identifier=$identifier');
+  //   var m = json.decode(response);
+  //   var anchor = Anchor.fromJson(m);
+  //   prettyPrint(anchor.toJson(), "🥏 🥏 🥏 🥏 ANCHOR RECEIVED 🍎 ");
+  //   return anchor;
+  // }
 
   static Future<AccountInfo> startAccountRegistrationFlow(
       String name, String email, String password, String cellphone) async {
