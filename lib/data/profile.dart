@@ -61,3 +61,33 @@ class SupplierProfile {
         'date': date,
       };
 }
+/*
+String startInvoiceAmount, endInvoiceAmount, offerDiscount;
+    String date;
+ */
+
+class TradeMatrixItem {
+  String startInvoiceAmount;
+  String endInvoiceAmount, offerDiscount;
+  String date;
+
+  TradeMatrixItem(
+      {this.startInvoiceAmount,
+      @required this.endInvoiceAmount,
+      @required this.offerDiscount,
+      @required this.date});
+
+  TradeMatrixItem.fromJson(Map data) {
+    this.startInvoiceAmount = data['startInvoiceAmount'];
+    this.endInvoiceAmount = data['endInvoiceAmount'];
+    this.date = data['date'];
+    this.offerDiscount = data['offerDiscount'];
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'startInvoiceAmount': startInvoiceAmount,
+        'endInvoiceAmount': endInvoiceAmount,
+        'date': date,
+        'offerDiscount': offerDiscount,
+      };
+}
