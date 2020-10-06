@@ -9,9 +9,11 @@ import 'package:bfnlibrary/data/network_operator.dart';
 import 'package:bfnlibrary/data/node_info.dart';
 import 'package:bfnlibrary/data/profile.dart';
 import 'package:bfnlibrary/data/user.dart';
+import 'package:bfnlibrary/util/functions.dart';
 import 'package:bfnlibrary/util/prefs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class Net {
@@ -416,6 +418,74 @@ class Net {
     });
     debugPrint(
         '🍎 🍊 🍎 🍊 Net: findInvoicesForSupplier: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<NodeInfo>> getNetworkNodes() async {
+    await DotEnv().load(".env");
+    var status = DotEnv().env['status'];
+    var mUrl = DotEnv().env['dev_anchorNodeUrl'];
+    if (status == 'prod') {
+      mUrl = DotEnv().env['dev_anchorNodeUrl'];
+    }
+    mUrl += 'getNetworkNodes';
+    p('getNetworkNodes: sending  🔵  🔵  🔵 ... $mUrl');
+    final response = await get(mUrl);
+
+    List<NodeInfo> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(NodeInfo.fromJson(f));
+    });
+    debugPrint('🍎 🍊 🍎 🍊 Net: getNetworkNodes: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<CustomerProfile>> getCustomerProfiles() async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '/bfn/admin/getCustomerProfiles';
+    p('getCustomerProfiles: sending  🔵  🔵  🔵 ... $mUrl');
+    final response = await get(mUrl);
+
+    List<CustomerProfile> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(CustomerProfile.fromJson(f));
+    });
+    debugPrint('🍎 🍊 🍎 🍊 Net: getCustomerProfiles: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvestorProfile>> getInvestorProfiles() async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '/bfn/admin/getInvestorProfiles';
+    p('getInvestorProfiles: sending  🔵  🔵  🔵 ... $mUrl');
+    final response = await get(mUrl);
+
+    List<InvestorProfile> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvestorProfile.fromJson(f));
+    });
+    debugPrint('🍎 🍊 🍎 🍊 Net: getInvestorProfiles: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<SupplierProfile>> getSupplierProfiles() async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '/bfn/admin/getSupplierProfiles';
+    p('getSupplierProfiles: sending  🔵  🔵  🔵 ... $mUrl');
+    final response = await get(mUrl);
+    p(' 🔵  🔵  🔵 Response from query: $response');
+    List<SupplierProfile> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(SupplierProfile.fromJson(f));
+    });
+    debugPrint('🍎 🍊 🍎 🍊 Net: getSupplierProfiles: found ${list.length}');
     return list;
   }
 

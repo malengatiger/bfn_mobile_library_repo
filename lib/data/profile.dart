@@ -1,64 +1,125 @@
+import 'package:bfnlibrary/data/account.dart';
 import 'package:flutter/cupertino.dart';
 
+/*
+ AccountInfoDTO account;
+
+
+    String stellarAccountId;
+    String rippleAccountId;
+    List<TradeMatrixItemDTO> tradeMatrixItems;
+ */
 class InvestorProfile {
-  String issuedBy;
-  String accountId, date;
-  double minimumInvoiceAmount, defaultDiscount;
-  double maximumInvoiceAmount, totalInvestment;
+  String bank, stellarAccountId, rippleAccountId;
+  String bankAccount, dateRegistered;
+  String minimumInvoiceAmount, defaultDiscount;
+  String maximumInvoiceAmount, totalInvestment;
+  List<TradeMatrixItem> tradeMatrixItems;
 
   InvestorProfile(
-      {this.issuedBy,
-      @required this.accountId,
+      {this.bank,
+      @required this.bankAccount,
       @required this.minimumInvoiceAmount,
       @required this.totalInvestment,
       @required this.defaultDiscount,
-      @required this.date,
+      @required this.dateRegistered,
+      @required this.stellarAccountId,
+      @required this.rippleAccountId,
+      @required this.tradeMatrixItems,
       @required this.maximumInvoiceAmount});
 
   InvestorProfile.fromJson(Map data) {
-    this.issuedBy = data['issuedBy'];
-    this.accountId = data['accountId'];
+    this.bank = data['bank'];
+    this.bankAccount = data['bankAccount'];
     this.minimumInvoiceAmount = data['minimumInvoiceAmount'];
     this.maximumInvoiceAmount = data['maximumInvoiceAmount'];
     this.defaultDiscount = data['defaultDiscount'];
-    this.date = data['date'];
+    this.dateRegistered = data['dateRegistered'];
     this.totalInvestment = data['totalInvestment'];
+
+    this.stellarAccountId = data['stellarAccountId'];
+    this.rippleAccountId = data['rippleAccountId'];
+    this.tradeMatrixItems = [];
+    if (data['tradeMatrixItems'] != null) {
+      List m = data['tradeMatrixItems'];
+      m.forEach((element) {
+        this.tradeMatrixItems.add(TradeMatrixItem.fromJson(element));
+      });
+    }
   }
 
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'issuedBy': issuedBy,
-        'accountId': accountId,
-        'minimumInvoiceAmount': minimumInvoiceAmount,
-        'maximumInvoiceAmount': maximumInvoiceAmount,
-        'date': date,
-        'defaultDiscount': defaultDiscount,
-        'totalInvestment': totalInvestment,
-      };
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> m = Map();
+    List<Map<String, dynamic>> trades = [];
+    if (tradeMatrixItems.isNotEmpty) {
+      tradeMatrixItems.forEach((element) {
+        trades.add(element.toJson());
+      });
+    }
+
+    m['bank'] = bank;
+    m['bankAccount'] = bankAccount;
+    m['minimumInvoiceAmount'] = minimumInvoiceAmount;
+    m['maximumInvoiceAmount'] = maximumInvoiceAmount;
+    m['dateRegistered'] = dateRegistered;
+    m['defaultDiscount'] = defaultDiscount;
+    m['totalInvestment'] = totalInvestment;
+    m['stellarAccountId'] = stellarAccountId;
+    m['rippleAccountId'] = rippleAccountId;
+    m['tradeMatrixItems'] = trades;
+
+    return m;
+  }
 }
 
+/*
+var account: AccountInfoDTO? = null,
+        var bank: String = "",
+        var bankAccount: String= "",
+        var maximumDiscount: String= "",
+        var stellarAccountId: String= "",
+        var rippleAccountId: String= "",
+        var assetCode: String= "",
+        var dateRegistered: String = "")
+ */
 class SupplierProfile {
-  String issuedBy;
-  String accountId, date;
-  double maximumDiscount;
+  AccountInfo account;
+  String bank;
+  String bankAccount, stellarAccountId;
+  String maximumDiscount, rippleAccountId, assetCode, dateRegistered;
 
   SupplierProfile(
-      {this.issuedBy,
-      @required this.accountId,
-      @required this.date,
+      {this.bank,
+      @required this.bankAccount,
+      @required this.stellarAccountId,
+      @required this.rippleAccountId,
+      @required this.assetCode,
+      @required this.dateRegistered,
       @required this.maximumDiscount});
 
   SupplierProfile.fromJson(Map data) {
-    this.issuedBy = data['issuedBy'];
-    this.accountId = data['accountId'];
+    this.bank = data['bank'];
+    this.bankAccount = data['bankAccount'];
     this.maximumDiscount = data['maximumDiscount'];
-    this.date = data['date'];
+    this.stellarAccountId = data['stellarAccountId'];
+
+    this.rippleAccountId = data['rippleAccountId'];
+    this.assetCode = data['assetCode'];
+    this.dateRegistered = data['dateRegistered'];
+    if (data['account'] != null) {
+      this.account = AccountInfo.fromJson(data['account']);
+    }
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'issuedBy': issuedBy,
-        'accountId': accountId,
+        'bank': bank,
+        'bankAccount': bankAccount,
         'maximumDiscount': maximumDiscount,
-        'date': date,
+        'stellarAccountId': stellarAccountId,
+        'rippleAccountId': rippleAccountId,
+        'assetCode': assetCode,
+        'dateRegistered': dateRegistered,
+        'account': account == null ? null : account.toJson(),
       };
 }
 /*
@@ -89,5 +150,51 @@ class TradeMatrixItem {
         'endInvoiceAmount': endInvoiceAmount,
         'date': date,
         'offerDiscount': offerDiscount,
+      };
+}
+
+/*
+var account: AccountInfoDTO,
+        val minimumInvoiceAmount: String,
+        val maximumInvoiceAmount: String,
+        val dateRegistered: String,
+        val email: String,
+        var stellarAccountId: String,
+        val rippleAccountId: String,
+        val cellphone: String)
+ */
+class CustomerProfile {
+  String minimumInvoiceAmount;
+  String maximumInvoiceAmount, dateRegistered;
+  String email, stellarAccountId, rippleAccountId, cellphone;
+
+  CustomerProfile(
+      {this.minimumInvoiceAmount,
+      @required this.maximumInvoiceAmount,
+      @required this.dateRegistered,
+      @required this.email,
+      @required this.stellarAccountId,
+      @required this.rippleAccountId,
+      @required this.cellphone});
+
+  CustomerProfile.fromJson(Map data) {
+    this.minimumInvoiceAmount = data['minimumInvoiceAmount'];
+    this.maximumInvoiceAmount = data['maximumInvoiceAmount'];
+    this.email = data['email'];
+    this.dateRegistered = data['dateRegistered'];
+
+    this.cellphone = data['cellphone'];
+    this.stellarAccountId = data['stellarAccountId'];
+    this.rippleAccountId = data['rippleAccountId'];
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'minimumInvoiceAmount': minimumInvoiceAmount,
+        'maximumInvoiceAmount': maximumInvoiceAmount,
+        'email': email,
+        'dateRegistered': dateRegistered,
+        'rippleAccountId': rippleAccountId,
+        'stellarAccountId': stellarAccountId,
+        'cellphone': cellphone,
       };
 }
