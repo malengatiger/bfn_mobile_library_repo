@@ -46,7 +46,7 @@ class Prefs {
     }
     var jx = json.decode(string);
     var association = new NodeInfo.fromJson(jx);
-    print("🌽 🌽 🌽 Node: retrieved : 🧩 🧩 🧩 🧩 🧩 $jx");
+    print("🌽 Node: retrieved : 🧩 🧩  $jx");
     return association;
   }
 

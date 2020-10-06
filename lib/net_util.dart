@@ -8,6 +8,8 @@ import 'package:bfnlibrary/data/invoice_offer.dart';
 import 'package:bfnlibrary/data/network_operator.dart';
 import 'package:bfnlibrary/data/node_info.dart';
 import 'package:bfnlibrary/data/profile.dart';
+import 'package:bfnlibrary/data/purchase_order.dart';
+import 'package:bfnlibrary/data/supplier_payment.dart';
 import 'package:bfnlibrary/data/user.dart';
 import 'package:bfnlibrary/util/functions.dart';
 import 'package:bfnlibrary/util/prefs.dart';
@@ -105,14 +107,13 @@ class Net {
 
     var end = DateTime.now();
     debugPrint(
-        '🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds\n\n');
+        '🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds\n');
     if (resp.statusCode == 200) {
-      debugPrint(
-          '🍎 🍊 Net: get: SUCCESS: Network Response Status Code: 🥬  🥬 ${resp.statusCode} 🥬  $mUrl');
+      p('🍎 🍊 Net: get: SUCCESS: Network Response Status Code: 🥬  🥬 ${resp.statusCode} 🥬  $mUrl');
       return resp.body;
     } else {
       var msg = ' 👿  Failed status code: ${resp.statusCode} 🥬  $mUrl';
-      debugPrint(msg);
+      p(msg);
       throw Exception(msg);
     }
   }
@@ -140,7 +141,7 @@ class Net {
     print(resp.body);
     var end = DateTime.now();
     debugPrint(
-        '🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds\n\n');
+        '🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds');
     if (resp.statusCode == 200) {
       debugPrint(
           '🍎 🍊 Net: post: SUCCESS: Network Response Status Code: 🥬  🥬 ${resp.statusCode} 🥬  $mUrl');
@@ -398,7 +399,7 @@ class Net {
     }
   }
 
-  static Future<List<Invoice>> getInvoices(
+  static Future<List<Invoice>> getInvoicesByAccount(
       {String accountId, bool consumed = false}) async {
     var node = await Prefs.getNode();
     String url = await buildUrl();
@@ -408,7 +409,7 @@ class Net {
       url +=
           '${BFN}findInvoicesForNode?accountId=$accountId&consumed=$consumed';
     }
-    debugPrint('sending  🔵  🔵  🔵 ... $url');
+    debugPrint('sending  $blue ... $url');
     final response = await get(url);
 
     List<Invoice> list = List();
@@ -416,8 +417,7 @@ class Net {
     m.forEach((f) {
       list.add(Invoice.fromJson(f));
     });
-    debugPrint(
-        '🍎 🍊 🍎 🍊 Net: findInvoicesForSupplier: found ${list.length}');
+    debugPrint('$good Net: findInvoicesForSupplier: found ${list.length}');
     return list;
   }
 
@@ -429,7 +429,7 @@ class Net {
       mUrl = DotEnv().env['dev_anchorNodeUrl'];
     }
     mUrl += 'getNetworkNodes';
-    p('getNetworkNodes: sending  🔵  🔵  🔵 ... $mUrl');
+    p('getNetworkNodes: sending  $blue ... $mUrl');
     final response = await get(mUrl);
 
     List<NodeInfo> list = List();
@@ -437,15 +437,15 @@ class Net {
     m.forEach((f) {
       list.add(NodeInfo.fromJson(f));
     });
-    debugPrint('🍎 🍊 🍎 🍊 Net: getNetworkNodes: found ${list.length}');
+    debugPrint('$good Net: getNetworkNodes: found ${list.length}');
     return list;
   }
 
   static Future<List<CustomerProfile>> getCustomerProfiles() async {
     var node = await Prefs.getNode();
     var mUrl = node.webAPIUrl;
-    mUrl += '/bfn/admin/getCustomerProfiles';
-    p('getCustomerProfiles: sending  🔵  🔵  🔵 ... $mUrl');
+    mUrl += '${BFN}getCustomerProfiles';
+    p('getCustomerProfiles: sending  $blue ... $mUrl');
     final response = await get(mUrl);
 
     List<CustomerProfile> list = List();
@@ -453,15 +453,15 @@ class Net {
     m.forEach((f) {
       list.add(CustomerProfile.fromJson(f));
     });
-    debugPrint('🍎 🍊 🍎 🍊 Net: getCustomerProfiles: found ${list.length}');
+    debugPrint('$good Net: getCustomerProfiles: found ${list.length}');
     return list;
   }
 
   static Future<List<InvestorProfile>> getInvestorProfiles() async {
     var node = await Prefs.getNode();
     var mUrl = node.webAPIUrl;
-    mUrl += '/bfn/admin/getInvestorProfiles';
-    p('getInvestorProfiles: sending  🔵  🔵  🔵 ... $mUrl');
+    mUrl += '${BFN}getInvestorProfiles';
+    p('getInvestorProfiles: sending  $blue ... $mUrl');
     final response = await get(mUrl);
 
     List<InvestorProfile> list = List();
@@ -469,26 +469,107 @@ class Net {
     m.forEach((f) {
       list.add(InvestorProfile.fromJson(f));
     });
-    debugPrint('🍎 🍊 🍎 🍊 Net: getInvestorProfiles: found ${list.length}');
+    debugPrint('$good Net: getInvestorProfiles: found ${list.length}');
     return list;
   }
 
   static Future<List<SupplierProfile>> getSupplierProfiles() async {
     var node = await Prefs.getNode();
     var mUrl = node.webAPIUrl;
-    mUrl += '/bfn/admin/getSupplierProfiles';
-    p('getSupplierProfiles: sending  🔵  🔵  🔵 ... $mUrl');
+    mUrl += '${BFN}getSupplierProfiles';
+    p('getSupplierProfiles: sending  $blue ... $mUrl');
     final response = await get(mUrl);
-    p(' 🔵  🔵  🔵 Response from query: $response');
     List<SupplierProfile> list = List();
     List m = json.decode(response);
     m.forEach((f) {
       list.add(SupplierProfile.fromJson(f));
     });
-    debugPrint('🍎 🍊 🍎 🍊 Net: getSupplierProfiles: found ${list.length}');
+    debugPrint('$good Net: getSupplierProfiles: found ${list.length}');
     return list;
   }
 
+  static Future<List<PurchaseOrder>> getPurchaseOrders(
+      {String startDate, String endDate}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getPurchaseOrders?startDate=$startDate&endDate=$endDate';
+    p('getPurchaseOrders: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<PurchaseOrder> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(PurchaseOrder.fromJson(f));
+    });
+    debugPrint('$good Net: getPurchaseOrders: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<Invoice>> getInvoices(
+      {String startDate, String endDate}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvoices?startDate=$startDate&endDate=$endDate';
+    p('getInvoices: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<Invoice> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(Invoice.fromJson(f));
+    });
+    debugPrint('$good Net: getInvoices: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvoiceOffer>> getInvoiceOffers(
+      {String startDate, String endDate}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvoiceOffers?startDate=$startDate&endDate=$endDate';
+    p('getInvoiceOffers: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<InvoiceOffer> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvoiceOffer.fromJson(f));
+    });
+    debugPrint('$good Net: getInvoiceOffers: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<SupplierPayment>> getSupplierPayments(
+      {String startDate, String endDate}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierPayments?startDate=$startDate&endDate=$endDate';
+    p('getSupplierPayments: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<SupplierPayment> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(SupplierPayment.fromJson(f));
+    });
+    debugPrint('$good Net: getSupplierPayments: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvoiceOffer>> getAcceptedInvoiceOffers(
+      {String startDate, String endDate}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl +=
+        '${BFN}getAcceptedInvoiceOffers?startDate=$startDate&endDate=$endDate';
+    p('getAcceptedInvoiceOffers: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<InvoiceOffer> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvoiceOffer.fromJson(f));
+    });
+    debugPrint('$good Net: getAcceptedInvoiceOffers: found ${list.length}');
+    return list;
+  }
+
+  static const String blue = '🔵  🔵  🔵', good = '🍎 🍊 ';
   static Future<List<InvoiceOffer>> getSupplierInvoiceOffers(
       {String accountId, bool consumed}) async {
     var node = await Prefs.getNode();
@@ -508,7 +589,7 @@ class Net {
     m.forEach((f) {
       list.add(InvoiceOffer.fromJson(f));
     });
-    debugPrint('🍎 🍊 🍎 🍊 Net: findOffersForInvestor: found ${list.length}');
+    debugPrint('$good Net: findOffersForInvestor: found ${list.length}');
     return list;
   }
 
@@ -523,7 +604,7 @@ class Net {
       url +=
           '${BFN}findOffersForInvestor?accountId=$accountId&consumed=$consumed';
     }
-    debugPrint('sending  🔵  🔵  🔵 ... $url');
+    debugPrint('sending  $blue ... $url');
     final response = await get(url);
 
     List<InvoiceOffer> list = List();
@@ -531,7 +612,7 @@ class Net {
     m.forEach((f) {
       list.add(InvoiceOffer.fromJson(f));
     });
-    debugPrint('🍎 🍊 🍎 🍊 Net: findOffersForInvestor: found ${list.length}');
+    debugPrint('$good Net: findOffersForInvestor: found ${list.length}');
     return list;
   }
 
@@ -542,7 +623,7 @@ class Net {
     debugPrint(url);
     final response = await get(url);
     var data = DashboardData.fromJson(json.decode(response));
-    debugPrint('🍎 🍊 🍎 🍊 Net: getDashboardData: found ${data.toJson()}');
+    debugPrint('$good Net: getDashboardData: found ${data.toJson()}');
     return data;
   }
 
