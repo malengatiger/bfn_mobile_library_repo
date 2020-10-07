@@ -6,7 +6,7 @@ class PurchaseOrder {
   String description;
   AccountInfo supplier, customer;
   String dateRegistered;
-  double amount;
+  String amount;
 
   PurchaseOrder(
       {this.purchaseOrderId,
@@ -28,12 +28,7 @@ class PurchaseOrder {
       this.customer = AccountInfo.fromJson(data['customer']);
     }
     this.dateRegistered = data['dateRegistered'];
-    if (data['amount'] is int) {
-      this.amount = data['amount'] * 1.00;
-    }
-    if (data['amount'] is double) {
-      this.amount = data['amount'];
-    }
+    this.amount = data['amount'];
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{

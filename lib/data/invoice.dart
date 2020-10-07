@@ -6,7 +6,7 @@ class Invoice {
   String description;
   AccountInfo supplier, customer;
   String dateRegistered;
-  double amount, valueAddedTax, totalAmount;
+  String amount, valueAddedTax, totalAmount;
 
   Invoice(
       {this.invoiceId,
@@ -30,24 +30,9 @@ class Invoice {
       this.customer = AccountInfo.fromJson(data['customer']);
     }
     this.dateRegistered = data['dateRegistered'];
-    if (data['amount'] is int) {
-      this.amount = data['amount'] * 1.00;
-    }
-    if (data['amount'] is double) {
-      this.amount = data['amount'];
-    }
-    if (data['valueAddedTax'] is int) {
-      this.valueAddedTax = data['valueAddedTax'] * 1.00;
-    }
-    if (data['valueAddedTax'] is double) {
-      this.valueAddedTax = data['valueAddedTax'];
-    }
-    if (data['totalAmount'] is int) {
-      this.totalAmount = data['totalAmount'] * 1.00;
-    }
-    if (data['totalAmount'] is double) {
-      this.totalAmount = data['totalAmount'];
-    }
+    this.amount = data['amount'];
+    this.valueAddedTax = data['valueAddedTax'];
+    this.totalAmount = data['totalAmount'];
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{

@@ -150,4 +150,36 @@ class Prefs {
       return b;
     }
   }
+
+  static void setStartDate(String startingDate) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString('startDate', startingDate);
+  }
+
+  static Future<String> getStartDate() async {
+    final preferences = await SharedPreferences.getInstance();
+    var b = preferences.getString('startDate');
+    if (b == null) {
+      return null;
+    } else {
+      print('🔵 🔵 🔵  startDate string retrieved: $b 🍏 🍏 ');
+      return b;
+    }
+  }
+
+  static void setEndDate(String endDate) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString('endDate', endDate);
+  }
+
+  static Future<String> getEndDate() async {
+    final preferences = await SharedPreferences.getInstance();
+    var b = preferences.getString('endDate');
+    if (b == null) {
+      return null;
+    } else {
+      print('🔵 🔵 🔵  endDate string retrieved: $b 🍏 🍏 ');
+      return b;
+    }
+  }
 }
