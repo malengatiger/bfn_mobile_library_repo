@@ -82,6 +82,7 @@ p(message) {
 }
 
 class Styles {
+  static const tiny = 12.0;
   static const small = 14.0;
   static const medium = 20.0;
   static const large = 32.0;
@@ -147,6 +148,21 @@ class Styles {
   static TextStyle blackSmall = TextStyle(
     fontWeight: FontWeight.normal,
     fontSize: small,
+    color: Colors.black,
+  );
+  static TextStyle blackTiny = TextStyle(
+    fontWeight: FontWeight.normal,
+    fontSize: tiny,
+    color: Colors.black,
+  );
+  static TextStyle greyTiny = TextStyle(
+    fontWeight: FontWeight.normal,
+    fontSize: tiny,
+    color: Colors.grey,
+  );
+  static TextStyle blackTinyBold = TextStyle(
+    fontWeight: FontWeight.w700,
+    fontSize: tiny,
     color: Colors.black,
   );
   static TextStyle blackBoldMedium = TextStyle(
