@@ -81,6 +81,34 @@ p(message) {
   }
 }
 
+Widget getDateRangeRow(String startDate, String endDate) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      Text(
+        '$startDate',
+        style: Styles.blackBoldSmall,
+      ),
+      SizedBox(width: 8),
+      Text('to'),
+      SizedBox(width: 8),
+      Text(
+        '$endDate',
+        style: Styles.blackBoldSmall,
+      ),
+      SizedBox(width: 32),
+    ],
+  );
+}
+
+String getCurrency(String amount) {
+  var curr = NumberFormat.currency(symbol: 'R', decimalDigits: 2);
+  var doubleAmount = double.parse(amount);
+  var formatted = curr.format(doubleAmount);
+
+  return formatted;
+}
+
 class Styles {
   static const tiny = 12.0;
   static const small = 14.0;

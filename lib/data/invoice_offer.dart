@@ -4,7 +4,7 @@ class InvoiceOffer {
   String invoiceId, offerId;
   AccountInfo supplier, investor, customer;
   String offerDate;
-  double offerAmount, discount, originalAmount;
+  String offerAmount, discount, originalAmount;
   String investorDate;
 
   InvoiceOffer(
