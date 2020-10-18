@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bfnlibrary/data/accepted_offer.dart';
 import 'package:bfnlibrary/data/account.dart';
 import 'package:bfnlibrary/data/dashboard_data.dart';
 import 'package:bfnlibrary/data/fb_user.dart';
@@ -552,7 +553,7 @@ class Net {
     return list;
   }
 
-  static Future<List<InvoiceOffer>> getAcceptedInvoiceOffers(
+  static Future<List<AcceptedOffer>> getAcceptedInvoiceOffers(
       {String startDate, String endDate}) async {
     var node = await Prefs.getNode();
     var mUrl = node.webAPIUrl;
@@ -560,10 +561,11 @@ class Net {
         '${BFN}getAcceptedInvoiceOffers?startDate=$startDate&endDate=$endDate';
     p('getAcceptedInvoiceOffers: sending  $blue ... $mUrl');
     final response = await get(mUrl);
-    List<InvoiceOffer> list = List();
+    List<AcceptedOffer> list = List();
     List m = json.decode(response);
     m.forEach((f) {
-      list.add(InvoiceOffer.fromJson(f));
+      var offer = AcceptedOffer.fromJson(f);
+      list.add(offer);
     });
     debugPrint('$good Net: getAcceptedInvoiceOffers: found ${list.length}');
     return list;

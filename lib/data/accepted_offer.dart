@@ -1,15 +1,14 @@
 import 'package:bfnlibrary/data/account.dart';
 
-class InvoiceOffer {
+class AcceptedOffer {
   String invoiceId, offerId;
-  AccountInfo supplier, investor;
+  AccountInfo supplier, investor, customer;
   String offerDate;
   String offerAmount, discount, originalAmount;
   String investorDate, externalId;
-  bool accepted;
   String invoiceNumber, acceptanceDate, dateRegistered;
 
-  InvoiceOffer(
+  AcceptedOffer(
       {this.invoiceId,
       this.supplier,
       this.investor,
@@ -18,17 +17,16 @@ class InvoiceOffer {
       this.discount,
       this.originalAmount,
       this.offerId,
-      this.accepted,
       this.investorDate,
       this.acceptanceDate,
       this.dateRegistered,
       this.externalId,
+      this.customer,
       this.invoiceNumber});
 
-  InvoiceOffer.fromJson(Map data) {
+  AcceptedOffer.fromJson(Map data) {
     this.invoiceId = data['invoiceId'];
     this.offerId = data['offerId'];
-    this.accepted = data['accepted'];
 
     this.investorDate = data['investorDate'];
     this.acceptanceDate = data['acceptanceDate'];
@@ -36,6 +34,9 @@ class InvoiceOffer {
     this.externalId = data['externalId'];
     this.invoiceNumber = data['invoiceNumber'];
 
+    if (data['customer'] != null) {
+      this.customer = AccountInfo.fromJson(data['customer']);
+    }
     if (data['supplier'] != null) {
       this.supplier = AccountInfo.fromJson(data['supplier']);
     }
@@ -67,13 +68,13 @@ class InvoiceOffer {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'invoiceId': invoiceId,
         'offerId': offerId,
-        'accepted': accepted,
         'supplier': supplier.toJson(),
         'offerAmount': offerAmount,
         'discount': discount,
         'investorDate': investorDate,
         'offerDate': offerDate,
         'investor': investor.toJson(),
+        'customer': customer.toJson(),
         'originalAmount': originalAmount,
         'invoiceNumber': invoiceNumber,
         'acceptanceDate': acceptanceDate,

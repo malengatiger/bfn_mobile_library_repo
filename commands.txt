@@ -1,0 +1,10 @@
+// Inside of Flutter projects
+// Generates the generate files once
+flutter pub run build_runner build
+// Watches the model files and generates on each change
+flutter pub run build_runner watch
+// Inside of Dart projects
+// Generates the generate files once
+pub run build_runner build
+// Watches the model files and generates on each change
+pub run build_runner watch

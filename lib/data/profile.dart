@@ -1,14 +1,6 @@
 import 'package:bfnlibrary/data/account.dart';
 import 'package:flutter/cupertino.dart';
 
-/*
- AccountInfoDTO account;
-
-
-    String stellarAccountId;
-    String rippleAccountId;
-    List<TradeMatrixItemDTO> tradeMatrixItems;
- */
 class InvestorProfile {
   String bank, stellarAccountId, rippleAccountId;
   String bankAccount, dateRegistered;
@@ -78,16 +70,6 @@ class InvestorProfile {
   }
 }
 
-/*
-var account: AccountInfoDTO? = null,
-        var bank: String = "",
-        var bankAccount: String= "",
-        var maximumDiscount: String= "",
-        var stellarAccountId: String= "",
-        var rippleAccountId: String= "",
-        var assetCode: String= "",
-        var dateRegistered: String = "")
- */
 class SupplierProfile {
   AccountInfo account;
   String bank, name;
@@ -131,10 +113,6 @@ class SupplierProfile {
         'account': account == null ? null : account.toJson(),
       };
 }
-/*
-String startInvoiceAmount, endInvoiceAmount, offerDiscount;
-    String date;
- */
 
 class TradeMatrixItem {
   String startInvoiceAmount;
@@ -162,16 +140,6 @@ class TradeMatrixItem {
       };
 }
 
-/*
-var account: AccountInfoDTO,
-        val minimumInvoiceAmount: String,
-        val maximumInvoiceAmount: String,
-        val dateRegistered: String,
-        val email: String,
-        var stellarAccountId: String,
-        val rippleAccountId: String,
-        val cellphone: String)
- */
 class CustomerProfile {
   String minimumInvoiceAmount;
   String maximumInvoiceAmount, dateRegistered;
