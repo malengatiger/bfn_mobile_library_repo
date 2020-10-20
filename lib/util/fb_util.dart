@@ -7,13 +7,16 @@ import 'utils.dart';
 
 class FireBaseUtil {
   static var isAuthed = false;
-  static void initialize() async {
+  static Future initialize() async {
     if (!isAuthed) {
       p('🥦 Trying to initialize Firebase ........');
       var m = await Firebase.initializeApp();
       isAuthed = true;
-      p('$FERN $FERN $FERN Firebase has been initialized: $PINK_FLOWER ${m.name} ${m.options.databaseURL} authed: $isAuthed');
+      p('$FERN $FERN $FERN Firebase has been initialized: '
+          '$PINK_FLOWER ${m.name} ${m.options.databaseURL} authed: $isAuthed');
+      return isAuthed;
     }
+    return isAuthed;
   }
 
   static Future<User> signIn() async {
@@ -47,7 +50,10 @@ class FireBaseUtil {
     var auth = FirebaseAuth.instance;
     p('🍔🍔🍔 ....... FirebaseAuth.instance done; what now? .......');
     if (auth.currentUser != null) {
-      p('$PEACH $PEACH $PEACH user is already logged in. Cool, Boss!  🥝');
+      var token = await auth.currentUser.getIdToken();
+      p('$PEACH $PEACH $PEACH user is already logged in. Cool, Boss!  🥝'
+          ' token: $token');
+
       return true;
     }
     p('$ERROR $ERROR user is NOT logged in yet! $ERROR');

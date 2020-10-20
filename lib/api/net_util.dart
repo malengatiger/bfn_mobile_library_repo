@@ -21,7 +21,7 @@ import 'package:http/http.dart' as http;
 
 class Net {
   static FirebaseAuth auth = FirebaseAuth.instance;
-  static const Map<String, String> headers = {
+  static Map<String, String> headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
   };
@@ -95,14 +95,13 @@ class Net {
   // }
 
   static Future<String> get(String mUrl) async {
-    var start = DateTime.now();
     var client = new http.Client();
-    var resp = await client
-        .get(
-      mUrl,
-      headers: headers,
-    )
-        .whenComplete(() {
+    var start = DateTime.now();
+    var token = await auth.currentUser.getIdToken(true);
+    headers['Authorization'] = 'Bearer $token';
+    p('🍎 🍎 🍎 🍎 🍎 mUrl = $mUrl 🍎 🍎  token: $token 🍎');
+    var resp = await client.get(mUrl, headers: headers).whenComplete(() {
+      debugPrint('🍊 🍊 🍊 Net: get whenComplete, closing client ..... ');
       client.close();
     });
 
@@ -120,8 +119,10 @@ class Net {
   }
 
   static Future post(String mUrl, Map bag) async {
-    var start = DateTime.now();
     var client = new http.Client();
+    var start = DateTime.now();
+    var token = await auth.currentUser.getIdToken(true);
+    headers['Authorization'] = 'Bearer $token';
     String body;
     if (bag != null) {
       body = json.encode(bag);
@@ -134,11 +135,11 @@ class Net {
       headers: headers,
     )
         .whenComplete(() {
-      debugPrint('🍊 🍊 🍊 Net: post whenComplete ');
+      debugPrint('🍊 🍊 🍊 Net: post whenComplete; closing client ..... ');
       client.close();
     });
     debugPrint(
-        '🍎 🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊 Net: post : PRINTING respomse.body from: $mUrl - $body');
+        '🍎 🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊 Net: post : PRINTING response.body from: $mUrl - $body');
     print(resp.body);
     var end = DateTime.now();
     debugPrint(
@@ -298,6 +299,20 @@ class Net {
     debugPrint(
         '🍊 Net: ..................................... getAccounts: found ${list.length}');
     return list;
+  }
+
+  static Future startDemoDriver({String seed}) async {
+    var prefix = 'http://192.168.86.240:10050';
+    var suffix = "/bfn/demo/startClientDemoDriver";
+    var url = '$prefix$suffix';
+    if (seed != null) {
+      url += "?seed=$seed";
+    }
+    debugPrint("🔱 ................ startDemoDriver url = $url");
+    final response = await get('$url');
+    debugPrint(
+        '🍊 Net: ..................................... startDemoDriver completed: $response');
+    return "🌽 🌽 🌽 🌽 🌽 🌽 startDemoDriver completed OK 🌽 🌽 🌽";
   }
 
   static Future<AccountInfo> getAccount(String accountId) async {

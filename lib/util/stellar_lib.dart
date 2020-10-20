@@ -1,4 +1,5 @@
 import 'package:bfnlibrary/util/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
@@ -10,13 +11,20 @@ import 'functions.dart';
 class StellarUtility {
   static var isLoaded = false;
   static var client = http.Client();
+  static var auth = FirebaseAuth.instance;
+
+  static Map<String, String> headers = {
+    'Content-type': 'application/json',
+    'Accept': 'application/json',
+  };
   static Future<void> ping() async {
     p("$BLUE_DOT ... starting new Stellar ping ...");
-
+    var token = await auth.currentUser.getIdToken(true);
+    headers['Authorization'] = 'Bearer $token';
     var url = await getUrl();
     var suffix = 'ping';
     try {
-      var uriResponse = await client.get('$url$suffix');
+      var uriResponse = await client.get('$url$suffix', headers: headers);
       var statusCode = uriResponse.statusCode;
       var body = uriResponse.body;
       p("$BLUE_HEART RESPONSE from ping at $url $YELLOW_FLOWER statusCode: $statusCode $PINK_FLOWER body: $body ...");
