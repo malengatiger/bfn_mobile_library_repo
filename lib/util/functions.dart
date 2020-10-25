@@ -102,7 +102,7 @@ Widget getDateRangeRow(String startDate, String endDate) {
 }
 
 String getCurrency(String amount) {
-  var curr = NumberFormat.currency(symbol: 'R', decimalDigits: 2);
+  var curr = NumberFormat.currency(symbol: '', decimalDigits: 2);
   var doubleAmount = double.parse(amount);
   var formatted = curr.format(doubleAmount);
 

@@ -7,7 +7,7 @@ class InvoiceOffer {
   String offerAmount, discount, originalAmount;
   String investorDate, externalId;
   bool accepted;
-  String invoiceNumber, acceptanceDate, dateRegistered;
+  String invoiceNumber, acceptanceDate, dateRegistered, dateClosed;
 
   InvoiceOffer(
       {this.invoiceId,
@@ -23,13 +23,14 @@ class InvoiceOffer {
       this.acceptanceDate,
       this.dateRegistered,
       this.externalId,
+      this.dateClosed,
       this.invoiceNumber});
 
   InvoiceOffer.fromJson(Map data) {
     this.invoiceId = data['invoiceId'];
     this.offerId = data['offerId'];
     this.accepted = data['accepted'];
-
+    this.dateClosed = data['dateClosed'];
     this.investorDate = data['investorDate'];
     this.acceptanceDate = data['acceptanceDate'];
     this.dateRegistered = data['dateRegistered'];
@@ -78,6 +79,7 @@ class InvoiceOffer {
         'invoiceNumber': invoiceNumber,
         'acceptanceDate': acceptanceDate,
         'dateRegistered': dateRegistered,
+        'dateClosed': dateClosed,
         'externalId': externalId,
       };
 }

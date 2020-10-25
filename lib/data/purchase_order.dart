@@ -5,7 +5,7 @@ class PurchaseOrder {
   String purchaseOrderNumber;
   String description;
   AccountInfo supplier, customer;
-  String dateRegistered;
+  String dateRegistered, invoiceCreatedDate;
   String amount;
 
   PurchaseOrder(
@@ -14,6 +14,7 @@ class PurchaseOrder {
       this.description,
       this.supplier,
       this.customer,
+      this.invoiceCreatedDate,
       this.dateRegistered,
       this.amount});
 
@@ -21,6 +22,7 @@ class PurchaseOrder {
     this.purchaseOrderId = data['purchaseOrderId'];
     this.purchaseOrderNumber = data['purchaseOrderNumber'];
     this.description = data['description'];
+    this.invoiceCreatedDate = data['invoiceCreatedDate'];
     if (data['supplier'] != null) {
       this.supplier = AccountInfo.fromJson(data['supplier']);
     }
@@ -38,6 +40,7 @@ class PurchaseOrder {
         'supplier': supplier == null ? null : supplier.toJson(),
         'amount': amount,
         'dateRegistered': dateRegistered,
+        'invoiceCreatedDate': invoiceCreatedDate,
         'customer': customer == null ? null : customer.toJson(),
       };
 }

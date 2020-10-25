@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bfnlibrary/data/account.dart';
 import 'package:bfnlibrary/data/network_operator.dart';
 import 'package:bfnlibrary/data/node_info.dart';
+import 'package:bfnlibrary/data/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Prefs {
@@ -26,6 +27,28 @@ class Prefs {
     var association = new AccountInfo.fromJson(jx);
     print("🌽 🌽 🌽 Account: retrieved : 🧩 🧩 🧩 🧩 🧩 $jx");
     return association;
+  }
+
+  static Future saveUser(BFNUser user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    Map map = user.toJson();
+    var jx = json.encode(map);
+    prefs.setString('user', jx);
+    print("🌽 🌽 🌽 User:  SAVED: 🌽: $jx ");
+    return null;
+  }
+
+  static Future<BFNUser> getUser() async {
+    var prefs = await SharedPreferences.getInstance();
+    var string = prefs.getString('user');
+    if (string == null) {
+      return null;
+    }
+    var jx = json.decode(string);
+    var user = new BFNUser.fromJson(jx);
+    print("🌽 🌽 🌽 User: retrieved : 🧩 🧩 🧩 🧩 🧩 $jx");
+    return user;
   }
 
   static Future saveNode(NodeInfo node) async {

@@ -4,22 +4,28 @@ import 'package:bfnlibrary/data/profile.dart';
 class SupplierPayment {
   InvoiceOffer acceptedOffer;
   SupplierProfile supplierProfile;
-  bool paid;
-  String date;
+  CustomerProfile customerProfile;
+  String supplierPaymentId;
+  String dateRegistered;
 
   SupplierPayment(
-      {this.acceptedOffer, this.supplierProfile, this.paid, this.date});
+      {this.acceptedOffer,
+      this.supplierProfile,
+      this.supplierPaymentId,
+      this.dateRegistered});
 
   SupplierPayment.fromJson(Map data) {
-    this.acceptedOffer = data['acceptedOffer'];
     if (data['supplierProfile'] != null) {
       this.supplierProfile = SupplierProfile.fromJson(data['supplierProfile']);
+    }
+    if (data['customerProfile'] != null) {
+      this.customerProfile = CustomerProfile.fromJson(data['customerProfile']);
     }
     if (data['acceptedOffer'] != null) {
       this.acceptedOffer = InvoiceOffer.fromJson(data['acceptedOffer']);
     }
-    this.date = data['date'];
-    this.paid = data['paid'];
+    this.dateRegistered = data['dateRegistered'];
+    this.supplierPaymentId = data['supplierPaymentId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -29,8 +35,10 @@ class SupplierPayment {
         acceptedOffer == null ? null : acceptedOffer.toJson();
     mmp['supplierProfile'] =
         supplierProfile == null ? null : supplierProfile.toJson();
-    mmp['paid'] = paid;
-    mmp['date'] = date;
+    mmp['customerProfile'] =
+        customerProfile == null ? null : customerProfile.toJson();
+    mmp['supplierPaymentId'] = supplierPaymentId;
+    mmp['dateRegistered'] = dateRegistered;
 
     return mmp;
   }
@@ -40,7 +48,7 @@ class TradeMatrix {
   double startInvoiceAmount;
   double endInvoiceAmount;
   double offerDiscount;
-  String date;
+  String dateRegistered;
   String id;
   int maximumInvoiceAgeInDays;
 
@@ -48,7 +56,7 @@ class TradeMatrix {
       {this.startInvoiceAmount,
       this.endInvoiceAmount,
       this.offerDiscount,
-      this.date,
+      this.dateRegistered,
       this.id,
       this.maximumInvoiceAgeInDays});
 
@@ -57,7 +65,7 @@ class TradeMatrix {
     this.endInvoiceAmount = data['endInvoiceAmount'];
     this.maximumInvoiceAgeInDays = data['maximumInvoiceAgeInDays'];
     this.offerDiscount = data['offerDiscount'];
-    this.date = data['date'];
+    this.dateRegistered = data['dateRegistered'];
     this.id = data['id'];
   }
 
@@ -65,7 +73,7 @@ class TradeMatrix {
         'startInvoiceAmount': startInvoiceAmount,
         'endInvoiceAmount': endInvoiceAmount,
         'maximumInvoiceAgeInDays': maximumInvoiceAgeInDays,
-        'date': date,
+        'dateRegistered': dateRegistered,
         'id': id,
         'offerDiscount': offerDiscount,
       };

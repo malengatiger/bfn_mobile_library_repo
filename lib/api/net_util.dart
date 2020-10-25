@@ -12,6 +12,7 @@ import 'package:bfnlibrary/data/profile.dart';
 import 'package:bfnlibrary/data/purchase_order.dart';
 import 'package:bfnlibrary/data/supplier_payment.dart';
 import 'package:bfnlibrary/data/user.dart';
+import 'package:bfnlibrary/util/fb_util.dart';
 import 'package:bfnlibrary/util/functions.dart';
 import 'package:bfnlibrary/util/prefs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,7 +21,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class Net {
-  static FirebaseAuth auth = FirebaseAuth.instance;
   static Map<String, String> headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
@@ -95,11 +95,16 @@ class Net {
   // }
 
   static Future<String> get(String mUrl) async {
+    await FireBaseUtil.initialize();
+    FirebaseAuth auth = FirebaseAuth.instance;
     var client = new http.Client();
     var start = DateTime.now();
     var token = await auth.currentUser.getIdToken(true);
+    if (token == null) {
+      throw Exception('Authentication token missing');
+    }
     headers['Authorization'] = 'Bearer $token';
-    p('🍎 🍎 🍎 🍎 🍎 mUrl = $mUrl 🍎 🍎  token: $token 🍎');
+    p('Net: get: 🍎 🍎 🍎 mUrl = $mUrl 🍎 🍎 authentication token is AVAILABLE 🍎 headers: $headers');
     var resp = await client.get(mUrl, headers: headers).whenComplete(() {
       debugPrint('🍊 🍊 🍊 Net: get whenComplete, closing client ..... ');
       client.close();
@@ -119,15 +124,22 @@ class Net {
   }
 
   static Future post(String mUrl, Map bag) async {
+    FireBaseUtil.initialize();
+    FirebaseAuth auth = FirebaseAuth.instance;
     var client = new http.Client();
     var start = DateTime.now();
     var token = await auth.currentUser.getIdToken(true);
+    if (token == null) {
+      throw Exception('Authentication token missing');
+    }
     headers['Authorization'] = 'Bearer $token';
     String body;
     if (bag != null) {
       body = json.encode(bag);
     }
-    debugPrint('🍊 🍊 🍊 Net: post ... calling with bag: $body');
+    p('Net: post: 🍎 🍎 🍎 mUrl = $mUrl '
+        '🍎 🍎 authentication token is AVAILABLE 🍎 headers: $headers');
+    p('🍊 🍊 🍊 Net: post ... calling with bag: $body');
     var resp = await client
         .post(
       mUrl,
@@ -315,6 +327,18 @@ class Net {
     return "🌽 🌽 🌽 🌽 🌽 🌽 startDemoDriver completed OK 🌽 🌽 🌽";
   }
 
+  static Future generatePurchaseOrders() async {
+    var prefix = 'http://192.168.86.240:10053';
+    var suffix = "/bfn/demo/generatePurchaseOrders?numberOfMonths=3";
+    var url = '$prefix$suffix';
+
+    debugPrint("🔱 ................ generatePurchaseOrders url = $url");
+    final response = await get('$url');
+    debugPrint(
+        '🍊 Net: ..................................... generatePurchaseOrders completed: $response');
+    return "🌽 🌽 🌽 🌽 🌽 🌽 generatePurchaseOrders completed OK 🌽 🌽 🌽";
+  }
+
   static Future<AccountInfo> getAccount(String accountId) async {
     var node = await Prefs.getNode();
     final response =
@@ -389,12 +413,12 @@ class Net {
     }
   }
 
-  static Future<List<UserDTO>> getUsers() async {
+  static Future<List<BFNUser>> getUsers() async {
     var node = await Prefs.getNode();
     String url = node.webAPIUrl + '${BFN}getUsers';
     print('🌸 🌸 🌸 Net: ...... getUsers ............ 🍊 $url');
 
-    List<UserDTO> users = List();
+    List<BFNUser> users = List();
     final response = await http.get(url);
     if (response.statusCode == 200) {
       debugPrint(
@@ -405,7 +429,7 @@ class Net {
 
       List k = json.decode(response.body);
       k.forEach((m) {
-        users.add(UserDTO.fromJson(m));
+        users.add(BFNUser.fromJson(m));
       });
       return users;
     } else {
@@ -646,13 +670,19 @@ class Net {
 
   static Future<String> ping() async {
     var node = await Prefs.getNode();
-    final response = await http.get(node.webAPIUrl + '${BFN}ping');
-    if (response.statusCode == 200) {
-      debugPrint(
-          '🍎 🍊 Net: ping: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
-      return response.body;
+    if (node != null) {
+      final response = await http.get(node.webAPIUrl + '${BFN}ping');
+      if (response.statusCode == 200) {
+        debugPrint(
+            '🍎 🍊 Net: ping: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
+        return response.body;
+      } else {
+        throw Exception(' 👿  Failed ping');
+      }
     } else {
-      throw Exception(' 👿  Failed ping');
+      var pm = ('👿👿👿 Net Ping cannot be performed');
+      p(pm);
+      return pm;
     }
   }
 //
