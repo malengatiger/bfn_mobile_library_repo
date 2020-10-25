@@ -7,6 +7,8 @@ class Invoice {
   AccountInfo supplier, customer;
   String dateRegistered;
   String amount, valueAddedTax, totalAmount;
+  String investorPaymentDate, investorPaymentId;
+  String supplierPaymentDate, supplierPaymentId;
 
   Invoice(
       {this.invoiceId,
@@ -17,12 +19,20 @@ class Invoice {
       this.dateRegistered,
       this.amount,
       this.valueAddedTax,
+      this.investorPaymentDate,
+      this.investorPaymentId,
+      this.supplierPaymentDate,
+      this.supplierPaymentId,
       this.totalAmount});
 
   Invoice.fromJson(Map data) {
     this.invoiceId = data['invoiceId'];
     this.invoiceNumber = data['invoiceNumber'];
     this.description = data['description'];
+    this.investorPaymentDate = data['investorPaymentDate'];
+    this.supplierPaymentDate = data['supplierPaymentDate'];
+    this.investorPaymentId = data['investorPaymentId'];
+    this.supplierPaymentId = data['supplierPaymentId'];
     if (data['supplier'] != null) {
       this.supplier = AccountInfo.fromJson(data['supplier']);
     }
@@ -44,6 +54,10 @@ class Invoice {
         'valueAddedTax': valueAddedTax,
         'totalAmount': totalAmount,
         'dateRegistered': dateRegistered,
+        'supplierPaymentDate': supplierPaymentDate,
+        'investorPaymentDate': investorPaymentDate,
+        'supplierPaymentId': supplierPaymentId,
+        'investorPaymentId': investorPaymentId,
         'customer': customer.toJson(),
       };
 }
