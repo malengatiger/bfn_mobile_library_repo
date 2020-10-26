@@ -69,6 +69,7 @@ class _NetworkNodeListState extends State<NetworkNodeList>
                 return GestureDetector(
                   onTap: () {
                     p('🔵  🔵  🔵 Selected node: ${node.addresses.elementAt(0)}');
+                    Prefs.saveNode(node);
                     Navigator.pop(context, node);
                   },
                   child: Card(

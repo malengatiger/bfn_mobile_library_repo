@@ -1,6 +1,8 @@
 // ignore: avoid_web_libraries_in_flutter
 
+import 'package:bfnlibrary/data/node_info.dart';
 import 'package:bfnlibrary/data/user.dart';
+import 'package:bfnlibrary/ui/nodes/node_list.dart';
 import 'package:bfnlibrary/ui/supplier/purchase_orders/purchase_orders_main.dart';
 import 'package:bfnlibrary/util/fb_util.dart';
 import 'package:bfnlibrary/util/functions.dart';
@@ -22,11 +24,13 @@ class _DashboardMobileState extends State<DashboardMobile>
   BFNUser user;
   stellar.AccountResponse accountResponse;
   bool isBusy = false;
+  NodeInfo node;
 
   @override
   void initState() {
     _controller = AnimationController(vsync: this);
     super.initState();
+    _getNode();
     _getAccount();
   }
 
@@ -55,6 +59,24 @@ class _DashboardMobileState extends State<DashboardMobile>
     FireBaseUtil.getInvestorPayments(user.accountInfo.identifier);
   }
 
+  void _getNode() async {
+    node = await Prefs.getNode();
+    if (node == null) {
+      node = await Navigator.push(
+        context,
+        PageTransition(
+          type: PageTransitionType.scale,
+          alignment: Alignment.topLeft,
+          duration: Duration(seconds: 1),
+          child: NetworkNodeList(),
+        ),
+      );
+      if (node is NodeInfo) {
+        setState(() {});
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -70,6 +92,10 @@ class _DashboardMobileState extends State<DashboardMobile>
           IconButton(
             onPressed: _getAccount,
             icon: Icon(Icons.refresh),
+          ),
+          IconButton(
+            onPressed: _getAccount,
+            icon: Icon(Icons.widgets_outlined),
           ),
         ],
         bottom: PreferredSize(
@@ -92,11 +118,17 @@ class _DashboardMobileState extends State<DashboardMobile>
                         ),
                   SizedBox(
                     height: 8,
-                  )
+                  ),
+                  Text(node == null
+                      ? 'Network Node'
+                      : node.addresses.elementAt(0)),
+                  SizedBox(
+                    height: 16,
+                  ),
                 ],
               ),
             ),
-            preferredSize: Size.fromHeight(80)),
+            preferredSize: Size.fromHeight(140)),
       ),
       backgroundColor: Colors.brown[100],
       body: Padding(
