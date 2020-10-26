@@ -4,6 +4,8 @@ import 'package:bfnlibrary/data/accepted_offer.dart';
 import 'package:bfnlibrary/data/account.dart';
 import 'package:bfnlibrary/data/dashboard_data.dart';
 import 'package:bfnlibrary/data/fb_user.dart';
+import 'package:bfnlibrary/data/investor_payment.dart';
+import 'package:bfnlibrary/data/investor_royalty.dart';
 import 'package:bfnlibrary/data/invoice.dart';
 import 'package:bfnlibrary/data/invoice_offer.dart';
 import 'package:bfnlibrary/data/network_operator.dart';
@@ -11,12 +13,12 @@ import 'package:bfnlibrary/data/node_info.dart';
 import 'package:bfnlibrary/data/profile.dart';
 import 'package:bfnlibrary/data/purchase_order.dart';
 import 'package:bfnlibrary/data/supplier_payment.dart';
+import 'package:bfnlibrary/data/supplier_royalty.dart';
 import 'package:bfnlibrary/data/user.dart';
 import 'package:bfnlibrary/util/fb_util.dart';
 import 'package:bfnlibrary/util/functions.dart';
 import 'package:bfnlibrary/util/prefs.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -39,7 +41,7 @@ class Net {
   // static Future<List<NodeInfo>> getNodesFromFirestore() async {
   //   if (!firebaseInitialized) {
   //     await Firebase.initializeApp();
-  //     debugPrint('🔵 🔵 🔵 🔵 🔵 🔵 🔵 🔵 Firebase has been initialized 🍎');
+  //     p('🔵 🔵 🔵 🔵 🔵 🔵 🔵 🔵 Firebase has been initialized 🍎');
   //     firebaseInitialized = true;
   //   }
   //   var list = List<NodeInfo>();
@@ -99,25 +101,31 @@ class Net {
     FirebaseAuth auth = FirebaseAuth.instance;
     var client = new http.Client();
     var start = DateTime.now();
-    var token = await auth.currentUser.getIdToken(true);
-    if (token == null) {
-      throw Exception('Authentication token missing');
+    var usr = auth.currentUser;
+    var token;
+    if (usr == null) {
+      p('👿👿👿 User has not authenticated with Firebase yet');
+    } else {
+      token = await usr.getIdToken(true);
+      if (token == null) {
+        throw Exception('Authentication token missing');
+      }
+      headers['Authorization'] = 'Bearer $token';
+      p('Net: get: 🍎 🍎 🍎 mUrl = $mUrl 🍎 🍎 authentication token is AVAILABLE 🍎 headers: $headers');
     }
-    headers['Authorization'] = 'Bearer $token';
-    p('Net: get: 🍎 🍎 🍎 mUrl = $mUrl 🍎 🍎 authentication token is AVAILABLE 🍎 headers: $headers');
     var resp = await client.get(mUrl, headers: headers).whenComplete(() {
-      debugPrint('🍊 🍊 🍊 Net: get whenComplete, closing client ..... ');
+      p('🍊 🍊 🍊 Net: get whenComplete, closing client ..... ');
       client.close();
     });
 
     var end = DateTime.now();
-    debugPrint(
-        '🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds\n');
+    p('🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds\n');
     if (resp.statusCode == 200) {
       p('🍎 🍊 Net: get: SUCCESS: Network Response Status Code: 🥬  🥬 ${resp.statusCode} 🥬  $mUrl');
       return resp.body;
     } else {
-      var msg = ' 👿  Failed status code: ${resp.statusCode} 🥬  $mUrl';
+      var msg =
+          ' 👿  Failed http get: status code: ${resp.statusCode} ${resp.body} 🥬  $mUrl';
       p(msg);
       throw Exception(msg);
     }
@@ -147,29 +155,26 @@ class Net {
       headers: headers,
     )
         .whenComplete(() {
-      debugPrint('🍊 🍊 🍊 Net: post whenComplete; closing client ..... ');
+      p('🍊 🍊 🍊 Net: post whenComplete; closing client ..... ');
       client.close();
     });
-    debugPrint(
-        '🍎 🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊 Net: post : PRINTING response.body from: $mUrl - $body');
+    p('🍎 🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊🍊 Net: post : PRINTING response.body from: $mUrl - $body');
     print(resp.body);
     var end = DateTime.now();
-    debugPrint(
-        '🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds');
+    p('🍎 🍊 Net: post  ##################### elapsed: ${end.difference(start).inSeconds} seconds');
     if (resp.statusCode == 200) {
-      debugPrint(
-          '🍎 🍊 Net: post: SUCCESS: Network Response Status Code: 🥬  🥬 ${resp.statusCode} 🥬  $mUrl');
+      p('🍎 🍊 Net: post: SUCCESS: Network Response Status Code: 🥬  🥬 ${resp.statusCode} 🥬  $mUrl');
       return resp.body;
     } else {
       var msg = ' 👿  Failed status code: ${resp.statusCode} 🥬  $mUrl';
-      debugPrint(resp.body);
+      p(resp.body);
       throw Exception(msg);
     }
   }
 
   static Future<NetworkOperator> updateAnchor(NetworkOperator anchor) async {
     String mx = await buildUrl();
-    debugPrint('🌸 CONCATENATED URL: 🌸 $mx' + 'bfn/admin/updateAnchor');
+    p('🌸 CONCATENATED URL: 🌸 $mx' + 'bfn/admin/updateAnchor');
     final response = await post(mx + 'bfn/admin/updateAnchor', anchor.toJson());
     var m = json.decode(response);
     var acct = NetworkOperator.fromJson(m);
@@ -177,7 +182,7 @@ class Net {
   }
 
   static Future<NetworkOperator> createAnchor(NetworkOperator anchor) async {
-    debugPrint('🍊🍊🍊🍊🍊 createAnchor starting the call ...');
+    p('🍊🍊🍊🍊🍊 createAnchor starting the call ...');
     var nodes = await Prefs.getNodes();
     if (nodes == null || nodes.isEmpty) {
       throw Exception("Nodes not found in Preferences");
@@ -193,7 +198,7 @@ class Net {
     }
     await Prefs.saveNode(node);
     String mx = await buildUrl();
-    debugPrint('🌸 CONCATENATED URL: 🌸 $mx' + 'bfn/admin/createAnchor');
+    p('🌸 CONCATENATED URL: 🌸 $mx' + 'bfn/admin/createAnchor');
     final response = await post(mx + 'bfn/admin/createAnchor', anchor.toJson());
     var m = json.decode(response);
     var acct = NetworkOperator.fromJson(m);
@@ -206,7 +211,7 @@ class Net {
       throw Exception('Node not found in Prefs');
     }
     var mx = '${node.webServerAddress}';
-    debugPrint("🍊 🍊 🍊  🌸 🌸 🌸 ${node.toJson()}  🌸 🌸 🌸  🍊 🍊 🍊 ");
+    p("🍊 🍊 🍊  🌸 🌸 🌸 ${node.toJson()}  🌸 🌸 🌸  🍊 🍊 🍊 ");
     if (node.webServerPort != null || node.webServerPort > 0) {
       mx += ':${node.webServerPort}/';
     } else {
@@ -244,7 +249,7 @@ class Net {
   //   var bag = {
   //     "identifier": identifier,
   //   };
-  //   debugPrint('🍊🍊🍊🍊🍊 getAnchor starting the call ...');
+  //   p('🍊🍊🍊🍊🍊 getAnchor starting the call ...');
   //   var url = await buildUrl();
   //   final response = await get(url + '${BFN}getAnchor?identifier=$identifier');
   //   var m = json.decode(response);
@@ -261,7 +266,7 @@ class Net {
       "password": password,
       "cellphone": cellphone
     };
-    debugPrint('🍊🍊🍊🍊🍊 startAccountRegistrationFlow starting the call ...');
+    p('🍊🍊🍊🍊🍊 startAccountRegistrationFlow starting the call ...');
     var node = await Prefs.getNode();
     final response =
         await post(node.webAPIUrl + '${BFN}startAccountRegistrationFlow', bag);
@@ -300,7 +305,7 @@ class Net {
 
   static Future<List<AccountInfo>> getAccounts() async {
     var prefix = await buildUrl();
-    debugPrint("🔱 getAccounts url = $prefix${BFN}getAccounts");
+    p("🔱 getAccounts url = $prefix${BFN}getAccounts");
     final response = await get('$prefix${BFN}getAccounts');
 
     List<AccountInfo> list = List();
@@ -308,8 +313,7 @@ class Net {
     m.forEach((f) {
       list.add(AccountInfo.fromJson(f));
     });
-    debugPrint(
-        '🍊 Net: ..................................... getAccounts: found ${list.length}');
+    p('🍊 Net: ..................................... getAccounts: found ${list.length}');
     return list;
   }
 
@@ -320,10 +324,9 @@ class Net {
     if (seed != null) {
       url += "?seed=$seed";
     }
-    debugPrint("🔱 ................ startDemoDriver url = $url");
+    p("🔱 ................ startDemoDriver url = $url");
     final response = await get('$url');
-    debugPrint(
-        '🍊 Net: ..................................... startDemoDriver completed: $response');
+    p('🍊 Net: ..................................... startDemoDriver completed: $response');
     return "🌽 🌽 🌽 🌽 🌽 🌽 startDemoDriver completed OK 🌽 🌽 🌽";
   }
 
@@ -332,47 +335,45 @@ class Net {
     var suffix = "/bfn/demo/generatePurchaseOrders?numberOfMonths=3";
     var url = '$prefix$suffix';
 
-    debugPrint("🔱 ................ generatePurchaseOrders url = $url");
+    p("🔱 ................ generatePurchaseOrders url = $url");
     final response = await get('$url');
-    debugPrint(
-        '🍊 Net: ..................................... generatePurchaseOrders completed: $response');
+    p('🍊 Net: ..................................... generatePurchaseOrders completed: $response');
     return "🌽 🌽 🌽 🌽 🌽 🌽 generatePurchaseOrders completed OK 🌽 🌽 🌽";
   }
 
-  static Future<AccountInfo> getAccount(String accountId) async {
+  static Future<AccountInfo> getAccount(String identifier) async {
     var node = await Prefs.getNode();
     final response =
-        await get(node.webAPIUrl + '${BFN}getAccount?accountId=$accountId');
+        await get(node.webAPIUrl + '${BFN}getAccount?identifier=$identifier');
 
     AccountInfo acctInfo = AccountInfo.fromJson(json.decode(response));
-    debugPrint(
-        '🍎 🍊 Net: getAccount: .................... found ${acctInfo.toJson()}');
+    p('🍎 🍊 Net: getAccount: .................... found ${acctInfo.toJson()}');
     return acctInfo;
   }
 
-  static Future<SupplierProfile> getSupplierProfile(String accountId) async {
+  static Future<SupplierProfile> getSupplierProfile(String identifier) async {
     var node = await Prefs.getNode();
     final response = await get(
-        node.webAPIUrl + '${BFN}getSupplierProfile?accountId=$accountId');
+        node.webAPIUrl + '${BFN}getSupplierProfile?identifier=$identifier');
 
     if (response == null) {
       return null;
     }
     SupplierProfile profile = SupplierProfile.fromJson(json.decode(response));
-    debugPrint('🍎 🍊 Net: getSupplierProfile: found ${profile.toJson()}');
+    p('🍎 🍊 Net: getSupplierProfile: found ${profile.toJson()}');
 
     return profile;
   }
 
-  static Future<InvestorProfile> getInvestorProfile(String accountId) async {
+  static Future<InvestorProfile> getInvestorProfile(String identifier) async {
     var node = await Prefs.getNode();
     final response = await get(
-        node.webAPIUrl + '${BFN}getInvestorProfile?accountId=$accountId');
+        node.webAPIUrl + '${BFN}getInvestorProfile?identifier=$identifier');
     if (response == null) {
       return null;
     }
     InvestorProfile profile = InvestorProfile.fromJson(json.decode(response));
-    debugPrint('🍎 🍊 Net: getInvestorProfile: found ${profile.toJson()}');
+    p('🍎 🍊 Net: getInvestorProfile: found ${profile.toJson()}');
     return profile;
   }
 
@@ -381,7 +382,7 @@ class Net {
     final response = await post(
         node.webAPIUrl + '${BFN}createInvestorProfile', profile.toJson());
 
-    debugPrint('🍎 🍊 Net: createInvestorProfile: $response');
+    p('🍎 🍊 Net: createInvestorProfile: $response');
     return response;
   }
 
@@ -390,7 +391,7 @@ class Net {
     final response = await post(
         node.webAPIUrl + '${BFN}createSupplierProfile', profile.toJson());
 
-    debugPrint('🍎 🍊 Net: createSupplierProfile: $response');
+    p('🍎 🍊 Net: createSupplierProfile: $response');
     return response;
   }
 
@@ -400,8 +401,7 @@ class Net {
     ;
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      debugPrint(
-          '🍎 🍊 Net: getInvoices: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
+      p('🍎 🍊 Net: getInvoices: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
       if (response.body == null) {
         return null;
       }
@@ -421,8 +421,7 @@ class Net {
     List<BFNUser> users = List();
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      debugPrint(
-          '🍎 🍊 Net: getUsers: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
+      p('🍎 🍊 Net: getUsers: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
       if (response.body == null) {
         return null;
       }
@@ -440,16 +439,16 @@ class Net {
   }
 
   static Future<List<Invoice>> getInvoicesByAccount(
-      {String accountId, bool consumed = false}) async {
+      {String identifier, bool consumed = false}) async {
     var node = await Prefs.getNode();
     String url = await buildUrl();
-    if (accountId == null) {
+    if (identifier == null) {
       url += '${BFN}findInvoicesForNode?consumed=$consumed';
     } else {
       url +=
-          '${BFN}findInvoicesForNode?accountId=$accountId&consumed=$consumed';
+          '${BFN}findInvoicesForNode?identifier=$identifier&consumed=$consumed';
     }
-    debugPrint('sending  $blue ... $url');
+    p('sending  $blue ... $url');
     final response = await get(url);
 
     List<Invoice> list = List();
@@ -457,16 +456,16 @@ class Net {
     m.forEach((f) {
       list.add(Invoice.fromJson(f));
     });
-    debugPrint('$good Net: findInvoicesForSupplier: found ${list.length}');
+    p('$good Net: findInvoicesForSupplier: found ${list.length}');
     return list;
   }
 
   static Future<List<NodeInfo>> getNetworkNodes() async {
     await DotEnv().load(".env");
     var status = DotEnv().env['status'];
-    var mUrl = DotEnv().env['dev_anchorNodeUrl'];
+    var mUrl = DotEnv().env['dev_bfnUrl'];
     if (status == 'prod') {
-      mUrl = DotEnv().env['dev_anchorNodeUrl'];
+      mUrl = DotEnv().env['prod_bfnUrl'];
     }
     mUrl += 'getNetworkNodes';
     p('getNetworkNodes: sending  $blue ... $mUrl');
@@ -477,7 +476,7 @@ class Net {
     m.forEach((f) {
       list.add(NodeInfo.fromJson(f));
     });
-    debugPrint('$good Net: getNetworkNodes: found ${list.length}');
+    p('$good Net: getNetworkNodes: found ${list.length}');
     return list;
   }
 
@@ -493,7 +492,7 @@ class Net {
     m.forEach((f) {
       list.add(CustomerProfile.fromJson(f));
     });
-    debugPrint('$good Net: getCustomerProfiles: found ${list.length}');
+    p('$good Net: getCustomerProfiles: found ${list.length}');
     return list;
   }
 
@@ -509,7 +508,7 @@ class Net {
     m.forEach((f) {
       list.add(InvestorProfile.fromJson(f));
     });
-    debugPrint('$good Net: getInvestorProfiles: found ${list.length}');
+    p('$good Net: getInvestorProfiles: found ${list.length}');
     return list;
   }
 
@@ -524,7 +523,7 @@ class Net {
     m.forEach((f) {
       list.add(SupplierProfile.fromJson(f));
     });
-    debugPrint('$good Net: getSupplierProfiles: found ${list.length}');
+    p('$good Net: getSupplierProfiles: found ${list.length}');
     return list;
   }
 
@@ -540,7 +539,183 @@ class Net {
     m.forEach((f) {
       list.add(PurchaseOrder.fromJson(f));
     });
-    debugPrint('$good Net: getPurchaseOrders: found ${list.length}');
+    p('$good Net: getPurchaseOrders: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<PurchaseOrder>> getSupplierPurchaseOrders(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierPurchaseOrders?identifier=$identifier';
+    p('getSupplierPurchaseOrders: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<PurchaseOrder> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(PurchaseOrder.fromJson(f));
+    });
+    p('$good Net: getSupplierPurchaseOrders: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<PurchaseOrder>> getCustomerPurchaseOrders(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getCustomerPurchaseOrders?identifier=$identifier';
+    p('getCustomerPurchaseOrders: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<PurchaseOrder> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(PurchaseOrder.fromJson(f));
+    });
+    p('$good Net: getCustomerPurchaseOrders: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvoiceOffer>> getSupplierInvoiceOffers(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierInvoiceOffers?identifier=$identifier';
+    p('getSupplierInvoiceOffers: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<InvoiceOffer> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvoiceOffer.fromJson(f));
+    });
+    p('$good Net: getSupplierInvoiceOffers: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvoiceOffer>> getInvestorInvoiceOffers(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvestorInvoiceOffers?identifier=$identifier';
+    p('getInvestorInvoiceOffers: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<InvoiceOffer> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvoiceOffer.fromJson(f));
+    });
+    p('$good Net: getInvestorInvoiceOffers: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<AcceptedOffer>> getSupplierAcceptedOffers(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierAcceptedOffers?identifier=$identifier';
+    p('getSupplierInvoiceOffers: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<AcceptedOffer> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(AcceptedOffer.fromJson(f));
+    });
+    p('$good Net: getSupplierAcceptedOffers: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<AcceptedOffer>> getInvestorAcceptedOffers(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvestorAcceptedOffers?identifier=$identifier';
+    p('getInvestorAcceptedOffers: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<AcceptedOffer> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(AcceptedOffer.fromJson(f));
+    });
+    p('$good Net: getInvestorAcceptedOffers: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvestorPayment>> getInvestorPaymentsByCustomer(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvestorPaymentsByCustomer?identifier=$identifier';
+    p('getInvestorPaymentsByCustomer: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<InvestorPayment> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvestorPayment.fromJson(f));
+    });
+    p('$good Net: getInvestorPaymentsByCustomer: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvestorPayment>> getInvestorPaymentsBySupplier(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvestorPaymentsBySupplier?identifier=$identifier';
+    p('getInvestorPaymentsBySupplier: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<InvestorPayment> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvestorPayment.fromJson(f));
+    });
+    p('$good Net: getInvestorPaymentsBySupplier: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<InvestorPayment>> getInvestorPaymentsByInvestor(
+      String identifier) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvestorPaymentsByInvestor?identifier=$identifier';
+    p('getInvestorPaymentsByInvestor: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<InvestorPayment> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(InvestorPayment.fromJson(f));
+    });
+    p('$good Net: getInvestorPaymentsByInvestor: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<NetworkSupplierRoyalty>> getSupplierRoyalties(
+      {String startDate, String endDate}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierRoyalties?startDate=$startDate&endDate=$endDate';
+    p('getSupplierRoyalties: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<NetworkSupplierRoyalty> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(NetworkSupplierRoyalty.fromJson(f));
+    });
+    p('$good Net: getSupplierRoyalties: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<NetworkInvestorRoyalty>> getInvestorRoyalties(
+      {String startDate, String endDate}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getInvestorRoyalties?startDate=$startDate&endDate=$endDate';
+    p('getInvestorRoyalties: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<NetworkInvestorRoyalty> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(NetworkInvestorRoyalty.fromJson(f));
+    });
+    p('$good Net: getInvestorRoyalties: found ${list.length}');
     return list;
   }
 
@@ -556,7 +731,7 @@ class Net {
     m.forEach((f) {
       list.add(Invoice.fromJson(f));
     });
-    debugPrint('$good Net: getInvoices: found ${list.length}');
+    p('$good Net: getInvoices: found ${list.length}');
     return list;
   }
 
@@ -572,7 +747,7 @@ class Net {
     m.forEach((f) {
       list.add(InvoiceOffer.fromJson(f));
     });
-    debugPrint('$good Net: getInvoiceOffers: found ${list.length}');
+    p('$good Net: getInvoiceOffers: found ${list.length}');
     return list;
   }
 
@@ -588,7 +763,7 @@ class Net {
     m.forEach((f) {
       list.add(SupplierPayment.fromJson(f));
     });
-    debugPrint('$good Net: getSupplierPayments: found ${list.length}');
+    p('$good Net: getSupplierPayments: found ${list.length}');
     return list;
   }
 
@@ -606,65 +781,20 @@ class Net {
       var offer = AcceptedOffer.fromJson(f);
       list.add(offer);
     });
-    debugPrint('$good Net: getAcceptedInvoiceOffers: found ${list.length}');
+    p('$good Net: getAcceptedInvoiceOffers: found ${list.length}');
     return list;
   }
 
   static const String blue = '🔵  🔵  🔵', good = '🍎 🍊 ';
-  static Future<List<InvoiceOffer>> getSupplierInvoiceOffers(
-      {String accountId, bool consumed}) async {
-    var node = await Prefs.getNode();
-    if (consumed == null) consumed = false;
-    String url;
-    if (accountId == null) {
-      url = node.webAPIUrl + '${BFN}findOffersForSupplier?consumed=$consumed';
-    } else {
-      url = node.webAPIUrl +
-          '${BFN}findOffersForSupplier?accountId=$accountId&consumed=$consumed';
-    }
-    debugPrint(url);
-    final response = await get(url);
-
-    List<InvoiceOffer> list = List();
-    List m = json.decode(response);
-    m.forEach((f) {
-      list.add(InvoiceOffer.fromJson(f));
-    });
-    debugPrint('$good Net: findOffersForInvestor: found ${list.length}');
-    return list;
-  }
-
-  static Future<List<InvoiceOffer>> getInvestorInvoiceOffers(
-      {String accountId, bool consumed}) async {
-    var node = await Prefs.getNode();
-    if (consumed == null) consumed = false;
-    String url = await buildUrl();
-    if (accountId == null) {
-      url += '${BFN}findOffersForInvestor?consumed=$consumed';
-    } else {
-      url +=
-          '${BFN}findOffersForInvestor?accountId=$accountId&consumed=$consumed';
-    }
-    debugPrint('sending  $blue ... $url');
-    final response = await get(url);
-
-    List<InvoiceOffer> list = List();
-    List m = json.decode(response);
-    m.forEach((f) {
-      list.add(InvoiceOffer.fromJson(f));
-    });
-    debugPrint('$good Net: findOffersForInvestor: found ${list.length}');
-    return list;
-  }
 
   static Future<DashboardData> getDashboardData() async {
     var node = await Prefs.getNode();
     String url = node.webAPIUrl + '${BFN}getDashboardData';
 
-    debugPrint(url);
+    p(url);
     final response = await get(url);
     var data = DashboardData.fromJson(json.decode(response));
-    debugPrint('$good Net: getDashboardData: found ${data.toJson()}');
+    p('$good Net: getDashboardData: found ${data.toJson()}');
     return data;
   }
 
@@ -673,8 +803,7 @@ class Net {
     if (node != null) {
       final response = await http.get(node.webAPIUrl + '${BFN}ping');
       if (response.statusCode == 200) {
-        debugPrint(
-            '🍎 🍊 Net: ping: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
+        p('🍎 🍊 Net: ping: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
         return response.body;
       } else {
         throw Exception(' 👿  Failed ping');
@@ -685,17 +814,4 @@ class Net {
       return pm;
     }
   }
-//
-//  static Future<String> startDemoDataGeneration() async {
-//    final response = await http.get(URL + '${BFN}demo');
-//
-//    if (response.statusCode == 200) {
-//      debugPrint(
-//          '🍎 🍊 Net: startDemoDataGeneration: Network Response Status Code: 🥬  🥬 ${response.statusCode} 🥬 ');
-//      Prefs.setDemoString('DEMO DATA COMPLETE');
-//      return response.body;
-//    } else {
-//      throw Exception(' 👿  Failed: startDemoDataGeneration');
-//    }
-//  }
 }

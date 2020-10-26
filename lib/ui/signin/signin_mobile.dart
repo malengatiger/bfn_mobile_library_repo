@@ -1,4 +1,5 @@
 import 'package:bfnlibrary/data/user.dart';
+import 'package:bfnlibrary/ui/wallet/wallet_dashboard.dart';
 import 'package:bfnlibrary/util/fb_util.dart';
 import 'package:bfnlibrary/util/functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -176,6 +177,15 @@ class _SigninMobileState extends State<SigninMobile>
     p('🥦🥦 User may be signed in: displayName: 🥦🥦🥦 ${res.displayName}');
     if (res is User) {
       Navigator.pop(context);
+      Navigator.push(
+        context,
+        PageTransition(
+          type: PageTransitionType.scale,
+          alignment: Alignment.topLeft,
+          duration: Duration(seconds: 1),
+          child: WalletDashboard(),
+        ),
+      );
     }
   }
 }
