@@ -1,15 +1,12 @@
-import 'package:bfnlibrary/data/purchase_order.dart';
 import 'package:flutter/material.dart';
 
-class PurchaseOrdersDesktop extends StatefulWidget {
-  final ValueChanged<PurchaseOrder> onTapped;
-
-  const PurchaseOrdersDesktop({Key key, this.onTapped}) : super(key: key);
+class SupplierPaymentsDesktop extends StatefulWidget {
   @override
-  _PurchaseOrdersDesktopState createState() => _PurchaseOrdersDesktopState();
+  _SupplierPaymentsDesktopState createState() =>
+      _SupplierPaymentsDesktopState();
 }
 
-class _PurchaseOrdersDesktopState extends State<PurchaseOrdersDesktop>
+class _SupplierPaymentsDesktopState extends State<SupplierPaymentsDesktop>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
 

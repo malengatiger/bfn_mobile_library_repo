@@ -134,12 +134,18 @@ class FireBaseUtil {
     p('🍔 ....... checking that user is authed .......');
     var auth = FirebaseAuth.instance;
     p('🍔🍔🍔 ....... FirebaseAuth.instance done; what now? .......');
-    if (auth.currentUser != null) {
-      var token = await auth.currentUser.getIdToken(true);
-      p('$PEACH $PEACH $PEACH user is already logged in. Cool, Boss!  🥝'
-          ' token is available. We Good! $PEACH token = $token');
+    try {
+      if (auth.currentUser != null) {
+        var token = await auth.currentUser.getIdToken(true);
+        p('$PEACH $PEACH $PEACH user is already logged in. Cool, Boss!  🥝'
+            ' token is available. We Good! $PEACH $token');
 
-      return true;
+        return true;
+      }
+    } catch (e) {
+      p(e);
+      p(' 👿 👿 👿 Current user on device does not exist: ${auth.currentUser.email}  👿 👿 👿');
+      return false;
     }
     p('$ERROR $ERROR user is NOT logged in yet! $ERROR');
     return false;

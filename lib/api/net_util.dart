@@ -111,7 +111,7 @@ class Net {
         throw Exception('Authentication token missing');
       }
       headers['Authorization'] = 'Bearer $token';
-      p('Net: get: 🍎 🍎 🍎 mUrl = $mUrl 🍎 🍎 authentication token is AVAILABLE 🍎 headers: $headers');
+      p('Net: get: 🍎 🍎 🍎 mUrl = $mUrl 🍎 🍎 authentication token is AVAILABLE 🍎');
     }
     var resp = await client.get(mUrl, headers: headers).whenComplete(() {
       p('🍊 🍊 🍊 Net: get whenComplete, closing client ..... ');
@@ -467,6 +467,9 @@ class Net {
     if (status == 'prod') {
       mUrl = DotEnv().env['prod_bfnUrl'];
     }
+    if (mUrl == null) {
+      throw Exception('Missing node url');
+    }
     mUrl += 'getNetworkNodes';
     p('getNetworkNodes: sending  $blue ... $mUrl');
     final response = await get(mUrl);
@@ -482,6 +485,9 @@ class Net {
 
   static Future<List<CustomerProfile>> getCustomerProfiles() async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getCustomerProfiles';
     p('getCustomerProfiles: sending  $blue ... $mUrl');
@@ -498,6 +504,9 @@ class Net {
 
   static Future<List<InvestorProfile>> getInvestorProfiles() async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getInvestorProfiles';
     p('getInvestorProfiles: sending  $blue ... $mUrl');
@@ -514,6 +523,9 @@ class Net {
 
   static Future<List<SupplierProfile>> getSupplierProfiles() async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getSupplierProfiles';
     p('getSupplierProfiles: sending  $blue ... $mUrl');
@@ -530,6 +542,9 @@ class Net {
   static Future<List<PurchaseOrder>> getPurchaseOrders(
       {String startDate, String endDate}) async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getPurchaseOrders?startDate=$startDate&endDate=$endDate';
     p('getPurchaseOrders: sending  $blue ... $mUrl');
@@ -546,6 +561,9 @@ class Net {
   static Future<List<PurchaseOrder>> getSupplierPurchaseOrders(
       String identifier) async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getSupplierPurchaseOrders?identifier=$identifier';
     p('getSupplierPurchaseOrders: sending  $blue ... $mUrl');
@@ -562,6 +580,9 @@ class Net {
   static Future<List<PurchaseOrder>> getCustomerPurchaseOrders(
       String identifier) async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getCustomerPurchaseOrders?identifier=$identifier';
     p('getCustomerPurchaseOrders: sending  $blue ... $mUrl');
@@ -722,6 +743,9 @@ class Net {
   static Future<List<Invoice>> getInvoices(
       {String startDate, String endDate}) async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getInvoices?startDate=$startDate&endDate=$endDate';
     p('getInvoices: sending  $blue ... $mUrl');
@@ -738,6 +762,9 @@ class Net {
   static Future<List<InvoiceOffer>> getInvoiceOffers(
       {String startDate, String endDate}) async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getInvoiceOffers?startDate=$startDate&endDate=$endDate';
     p('getInvoiceOffers: sending  $blue ... $mUrl');
@@ -754,6 +781,9 @@ class Net {
   static Future<List<SupplierPayment>> getSupplierPayments(
       {String startDate, String endDate}) async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl += '${BFN}getSupplierPayments?startDate=$startDate&endDate=$endDate';
     p('getSupplierPayments: sending  $blue ... $mUrl');
@@ -767,9 +797,62 @@ class Net {
     return list;
   }
 
+  static Future<List<SupplierPayment>> getSupplierPaymentsBySupplier(
+      {String identifier}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierPaymentsBySupplier?identifier=$identifier';
+    p('getSupplierPaymentsBySupplier: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<SupplierPayment> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(SupplierPayment.fromJson(f));
+    });
+    p('$good Net: getSupplierPaymentsBySupplier: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<SupplierPayment>> getSupplierPaymentsByInvestor(
+      {String identifier}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierPaymentsByInvestor?identifier=$identifier';
+    p('getSupplierPaymentsByInvestor: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<SupplierPayment> list = List();
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(SupplierPayment.fromJson(f));
+    });
+    p('$good Net: getSupplierPaymentsByInvestor: found ${list.length}');
+    return list;
+  }
+
+  static Future<List<SupplierPayment>> getSupplierPaymentsByCustomer(
+      {String identifier}) async {
+    var node = await Prefs.getNode();
+    var mUrl = node.webAPIUrl;
+    mUrl += '${BFN}getSupplierPaymentsByCustomer?identifier=$identifier';
+    p('getSupplierPaymentsByCustomer: sending  $blue ... $mUrl');
+    final response = await get(mUrl);
+    List<SupplierPayment> list = List();
+    p('🥬🥬🥬 RESPONSE DATA FOR getSupplierPaymentsByCustomer: 🥬🥬🥬');
+    p(response);
+    List m = json.decode(response);
+    m.forEach((f) {
+      list.add(SupplierPayment.fromJson(f));
+    });
+    p('$good Net: getSupplierPaymentsByCustomer: found ${list.length}');
+    return list;
+  }
+
   static Future<List<AcceptedOffer>> getAcceptedInvoiceOffers(
       {String startDate, String endDate}) async {
     var node = await Prefs.getNode();
+    if (node == null) {
+      return [];
+    }
     var mUrl = node.webAPIUrl;
     mUrl +=
         '${BFN}getAcceptedInvoiceOffers?startDate=$startDate&endDate=$endDate';

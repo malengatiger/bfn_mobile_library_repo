@@ -1,4 +1,5 @@
 import 'package:bfnlibrary/data/account.dart';
+import 'package:bfnlibrary/util/functions.dart';
 
 class AcceptedOffer {
   String invoiceId, offerId;
@@ -25,6 +26,7 @@ class AcceptedOffer {
       this.invoiceNumber});
 
   AcceptedOffer.fromJson(Map data) {
+    p('Creating the AcceptedOffer fromJson 🔵 🔵 🔵');
     this.invoiceId = data['invoiceId'];
     this.offerId = data['offerId'];
 
@@ -36,12 +38,18 @@ class AcceptedOffer {
 
     if (data['customer'] != null) {
       this.customer = AccountInfo.fromJson(data['customer']);
+      p('🌽🌽 should have created customer ... 🌽 ');
+      prettyPrint(customer.toJson(), '🔵 Customer 🔵');
     }
     if (data['supplier'] != null) {
       this.supplier = AccountInfo.fromJson(data['supplier']);
+      p('🌽🌽 should have created supplier ... 🌽 ');
+      prettyPrint(supplier.toJson(), '🔵 Supplier 🔵');
     }
     if (data['investor'] != null) {
       this.investor = AccountInfo.fromJson(data['investor']);
+      p('🌽🌽 should have created investor ... 🌽 ');
+      prettyPrint(investor.toJson(), '🔵 Investor 🔵');
     }
     this.offerDate = data['offerDate'];
     if (data['offerAmount'] is int) {

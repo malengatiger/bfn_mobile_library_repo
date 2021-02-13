@@ -2,10 +2,9 @@ import 'package:bfnlibrary/data/purchase_order.dart';
 import 'package:flutter/material.dart';
 
 class PurchaseOrdersTablet extends StatefulWidget {
-  final List<PurchaseOrder> purchaseOrders;
+  final ValueChanged<PurchaseOrder> onTapped;
 
-  const PurchaseOrdersTablet(this.purchaseOrders);
-
+  const PurchaseOrdersTablet({Key key, this.onTapped}) : super(key: key);
   @override
   _PurchaseOrdersTabletState createState() => _PurchaseOrdersTabletState();
 }

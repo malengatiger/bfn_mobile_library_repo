@@ -1,4 +1,4 @@
-import 'package:bfnlibrary/api/net_util.dart';
+import 'package:bfnlibrary/api/bloc.dart';
 import 'package:bfnlibrary/data/purchase_order.dart';
 import 'package:bfnlibrary/data/user.dart';
 import 'package:bfnlibrary/ui/supplier/purchase_orders/purchase_orders_desktop.dart';
@@ -21,9 +21,8 @@ class PurchaseOrdersMain extends StatefulWidget {
 class _PurchaseOrdersMainState extends State<PurchaseOrdersMain>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
-  List<PurchaseOrder> purchaseOrders = [];
-  List<PurchaseOrder> supplierPurchaseOrders = [];
-  List<PurchaseOrder> customerPurchaseOrders = [];
+  final Bloc bloc = Bloc();
+
   var isBusy = false;
   BFNUser user;
 
@@ -48,14 +47,7 @@ class _PurchaseOrdersMainState extends State<PurchaseOrdersMain>
     setState(() {
       isBusy = true;
     });
-    supplierPurchaseOrders =
-        await Net.getSupplierPurchaseOrders(user.accountInfo.identifier);
-
-    customerPurchaseOrders =
-        await Net.getCustomerPurchaseOrders(user.accountInfo.identifier);
-    purchaseOrders.addAll(supplierPurchaseOrders);
-    purchaseOrders.addAll(customerPurchaseOrders);
-    p('🍊🍊🍊 Total purchaseOrders: ${purchaseOrders.length}');
+    await bloc.getPurchaseOrders(user.accountInfo.identifier);
     setState(() {
       isBusy = false;
     });
@@ -64,20 +56,47 @@ class _PurchaseOrdersMainState extends State<PurchaseOrdersMain>
   @override
   Widget build(BuildContext context) {
     return isBusy
-        ? Center(
-            child: Container(
-              width: 64,
-              height: 64,
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.yellowAccent,
-                strokeWidth: 16,
+        ? Container(
+            color: Colors.brown[100],
+            child: Center(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 100,
+                  ),
+                  Text(
+                    'Loading Purchase Orders',
+                    style: Styles.blackBoldMedium,
+                  ),
+                  SizedBox(
+                    height: 60,
+                  ),
+                  Container(
+                    width: 64,
+                    height: 64,
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.yellowAccent,
+                      strokeWidth: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
           )
         : ScreenTypeLayout(
-            mobile: PurchaseOrdersMobile(purchaseOrders),
-            tablet: PurchaseOrdersTablet(purchaseOrders),
-            desktop: PurchaseOrdersDesktop(purchaseOrders),
+            mobile: PurchaseOrdersMobile(
+              onTapped: _onTapped,
+            ),
+            tablet: PurchaseOrdersTablet(
+              onTapped: _onTapped,
+            ),
+            desktop: PurchaseOrdersDesktop(
+              onTapped: _onTapped,
+            ),
           );
+  }
+
+  void _onTapped(PurchaseOrder purchaseOrder) {
+    p(' 🔵  🔵 PurchaseOrder tapped: ${purchaseOrder.customer.name} ${purchaseOrder.amount}');
   }
 }

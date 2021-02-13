@@ -1,8 +1,8 @@
-import 'package:bfnlibrary/data/invoice_offer.dart';
+import 'package:bfnlibrary/data/accepted_offer.dart';
 import 'package:bfnlibrary/data/profile.dart';
 
 class SupplierPayment {
-  InvoiceOffer acceptedOffer;
+  AcceptedOffer acceptedOffer;
   SupplierProfile supplierProfile;
   CustomerProfile customerProfile;
   String supplierPaymentId;
@@ -22,7 +22,7 @@ class SupplierPayment {
       this.customerProfile = CustomerProfile.fromJson(data['customerProfile']);
     }
     if (data['acceptedOffer'] != null) {
-      this.acceptedOffer = InvoiceOffer.fromJson(data['acceptedOffer']);
+      this.acceptedOffer = AcceptedOffer.fromJson(data['acceptedOffer']);
     }
     this.dateRegistered = data['dateRegistered'];
     this.supplierPaymentId = data['supplierPaymentId'];
